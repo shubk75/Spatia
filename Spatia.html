@@ -285,6 +285,15 @@
         <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
       </button>
 
+      <button id="exportProjectBtn" onclick="exportProject()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-all text-xs" title="Export Project (photos + site info)">
+        <i data-lucide="package-plus" class="w-4 h-4"></i>
+      </button>
+
+      <input type="file" id="importProjectInput" accept=".json,application/json" class="hidden" onchange="importProject(event)" />
+      <button id="importProjectBtn" onclick="document.getElementById('importProjectInput').click()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-all text-xs" title="Import Project (.json)">
+        <i data-lucide="folder-up" class="w-4 h-4"></i>
+      </button>
+
       <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-all text-xs" title="Switch theme">
         <i data-lucide="moon" id="themeIconMoon" class="w-4 h-4"></i>
         <i data-lucide="sun" id="themeIconSun" class="w-4 h-4 hidden"></i>
@@ -703,6 +712,9 @@
 
     // Historical / contextual Site Info side panel state
     let infoPanelOpen = false;
+    // Tracks the currently loaded Site Info file (name + base64 data URL + type flags)
+    // so it can be bundled into an exported project.
+    let siteInfoFileState = null;
     if (typeof pdfjsLib !== 'undefined') {
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
@@ -2254,6 +2266,10 @@
       lucide.createIcons();
 
       try {
+        // Capture the raw file as a base64 data URL so it can be re-embedded
+        // verbatim into an exported project (and restored on import).
+        const fileDataUrl = await readFileAsDataURL(file);
+
         if (isPdf) {
           const arrayBuffer = await file.arrayBuffer();
           const text = await extractPdfText(arrayBuffer);
@@ -2266,9 +2282,27 @@
           const text = await file.text();
           renderSiteInfoText(text, false);
         }
+
+        siteInfoFileState = {
+          name: file.name,
+          isPdf: isPdf,
+          isMarkdown: isMarkdown,
+          dataUrl: fileDataUrl
+        };
       } catch (err) {
         content.innerHTML = `<div class="text-red-400 text-[11px] py-6 text-center">Could not read this file${err && err.message ? ': ' + escapeHtml(err.message) : '.'}</div>`;
+        siteInfoFileState = null;
       }
+    }
+
+    // Reads a File/Blob as a base64 data URL (used to embed site-info files into exports).
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
     }
 
     async function extractPdfText(arrayBuffer) {
@@ -2327,6 +2361,202 @@
         <p class="text-[11px] max-w-[220px]">No file loaded yet.</p>
       </div>`;
       lucide.createIcons();
+      siteInfoFileState = null;
+    }
+
+    // ---------------------------------------------------------------------------
+    // PROJECT EXPORT / IMPORT (bundles every source photo + site info file)
+    // ---------------------------------------------------------------------------
+    const PROJECT_FILE_TYPE = 'spatia-project';
+    const PROJECT_FILE_VERSION = 1;
+
+    async function exportProject() {
+      if (!photoItems.length) {
+        alert('Upload photos or load a sample dataset before exporting a project.');
+        return;
+      }
+
+      const exportBtn = document.getElementById('exportProjectBtn');
+      if (exportBtn) exportBtn.disabled = true;
+
+      try {
+        const projectData = {
+          type: PROJECT_FILE_TYPE,
+          version: PROJECT_FILE_VERSION,
+          exportedAt: new Date().toISOString(),
+          settings: {
+            customCameraFov: customCameraFov,
+            smartPoles: document.getElementById('smartPolesToggle').checked,
+            brightness: sphereBrightnessMultiplier
+          },
+          // Every uploaded/standardized photo, in sequence order, with its
+          // assigned direction metadata — enough to fully rebuild the scene.
+          photos: photoItems.map(item => ({
+            name: item.name,
+            directionKey: item.directionKey,
+            yaw: item.yaw,
+            pitch: item.pitch,
+            type: item.type,
+            dataUrl: item.dataUrl
+          })),
+          // The attached Markdown/PDF site info file, embedded verbatim as base64.
+          siteInfo: siteInfoFileState ? {
+            name: siteInfoFileState.name,
+            isPdf: siteInfoFileState.isPdf,
+            isMarkdown: siteInfoFileState.isMarkdown,
+            dataUrl: siteInfoFileState.dataUrl
+          } : null
+        };
+
+        const blob = new Blob([JSON.stringify(projectData)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `spatia_project_${Date.now()}.json`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error('Export error:', err);
+        alert('Could not export project: ' + err.message);
+      } finally {
+        if (exportBtn) exportBtn.disabled = false;
+      }
+    }
+
+    // Loads a base64 data URL into an <img> element (used to rebuild photoItems on import).
+    function loadImageFromDataUrl(dataUrl) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('Failed to decode an embedded photo'));
+        img.src = dataUrl;
+      });
+    }
+
+    async function importProject(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const importBtn = document.getElementById('importProjectBtn');
+      if (importBtn) importBtn.disabled = true;
+
+      try {
+        const text = await file.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (parseErr) {
+          throw new Error('This file is not a valid SPATIA project (bad JSON).');
+        }
+
+        if (!data || data.type !== PROJECT_FILE_TYPE || !Array.isArray(data.photos) || !data.photos.length) {
+          throw new Error('This file is not a valid SPATIA project.');
+        }
+
+        // Rebuild every photo item from its embedded base64 image data.
+        const rebuiltItems = [];
+        for (const p of data.photos) {
+          const imgEl = await loadImageFromDataUrl(p.dataUrl);
+          rebuiltItems.push({
+            id: 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+            file: null,
+            imgElement: imgEl,
+            dataUrl: p.dataUrl,
+            name: p.name || 'Imported Photo',
+            directionKey: p.directionKey || 'north',
+            yaw: typeof p.yaw === 'number' ? p.yaw : 0,
+            pitch: typeof p.pitch === 'number' ? p.pitch : 0,
+            type: p.type || 'horizon'
+          });
+        }
+        photoItems = rebuiltItems;
+
+        // Restore fine-tuning settings.
+        if (data.settings) {
+          if (typeof data.settings.customCameraFov === 'number') {
+            customCameraFov = data.settings.customCameraFov;
+            const fovSlider = document.getElementById('cameraFovSlider');
+            const fovLabel = document.getElementById('fovSliderVal');
+            if (customCameraFov > 0) {
+              fovSlider.value = customCameraFov;
+              fovLabel.innerText = `${customCameraFov}°`;
+            } else {
+              fovLabel.innerText = 'Auto';
+            }
+          }
+          if (typeof data.settings.smartPoles === 'boolean') {
+            document.getElementById('smartPolesToggle').checked = data.settings.smartPoles;
+          }
+          if (typeof data.settings.brightness === 'number') {
+            sphereBrightnessMultiplier = data.settings.brightness;
+            const brightnessSlider = document.getElementById('brightnessSlider');
+            const pct = Math.round(sphereBrightnessMultiplier * 100);
+            brightnessSlider.value = pct;
+            document.getElementById('brightnessVal').innerText = `${pct}%`;
+          }
+        }
+
+        renderPhotoSequenceList();
+        await runStitchingProcess();
+        updateSphereBrightness(document.getElementById('brightnessSlider').value);
+
+        // Restore the attached site info file, if the project had one.
+        if (data.siteInfo && data.siteInfo.dataUrl) {
+          await restoreSiteInfoFromProject(data.siteInfo);
+        } else {
+          clearSiteInfo();
+        }
+      } catch (err) {
+        console.error('Import error:', err);
+        alert('Could not import project: ' + err.message);
+      } finally {
+        if (importBtn) importBtn.disabled = false;
+        event.target.value = '';
+      }
+    }
+
+    // Rebuilds the Site Information panel from an embedded project data URL,
+    // reusing the same PDF/Markdown extraction logic as a live upload.
+    async function restoreSiteInfoFromProject(siteInfo) {
+      if (!infoPanelOpen) toggleInfoPanel(true);
+
+      const badge = document.getElementById('siteInfoFileBadge');
+      const nameEl = document.getElementById('siteInfoFileName');
+      const hint = document.getElementById('siteInfoHint');
+      const content = document.getElementById('siteInfoContent');
+
+      badge.classList.remove('hidden');
+      nameEl.innerText = siteInfo.name || 'Site Info';
+      hint.classList.add('hidden');
+      content.innerHTML = `<div class="flex items-center gap-2 text-slate-400 text-[11px] py-6 justify-center">
+        <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-brand-400"></i>
+        <span>Reading ${siteInfo.isPdf ? 'PDF' : 'document'}&hellip;</span>
+      </div>`;
+      lucide.createIcons();
+
+      try {
+        const res = await fetch(siteInfo.dataUrl);
+        const blob = await res.blob();
+
+        if (siteInfo.isPdf) {
+          const arrayBuffer = await blob.arrayBuffer();
+          const extractedText = await extractPdfText(arrayBuffer);
+          renderSiteInfoText(extractedText, false);
+        } else {
+          const extractedText = await blob.text();
+          renderSiteInfoText(extractedText, !!siteInfo.isMarkdown);
+        }
+
+        siteInfoFileState = {
+          name: siteInfo.name,
+          isPdf: !!siteInfo.isPdf,
+          isMarkdown: !!siteInfo.isMarkdown,
+          dataUrl: siteInfo.dataUrl
+        };
+      } catch (err) {
+        content.innerHTML = `<div class="text-red-400 text-[11px] py-6 text-center">Could not read the embedded site info file${err && err.message ? ': ' + escapeHtml(err.message) : '.'}</div>`;
+        siteInfoFileState = null;
+      }
     }
 
     // ---------------------------------------------------------------------------
