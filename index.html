@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPATIA 3D — Square Edge-to-Edge Photo Sphere & Tourism Studio</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+              950: '#082f49',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Three.js and OrbitControls CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.25);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(56, 189, 248, 0.5);
+    }
+    
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-card:hover {
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+
+    .canvas-container {
+      position: relative;
+      touch-action: none;
+      user-select: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-brand-500 selection:text-white flex flex-col overflow-x-hidden">
+
+  <!-- ========================================================================= -->
+  <!-- TOP NAVIGATION BAR -->
+  <!-- ========================================================================= -->
+  <header class="sticky top-0 z-40 w-full glass-panel border-b border-slate-800/80 px-4 lg:px-8 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-cyan-400 p-0.5 shadow-lg shadow-brand-500/20 flex items-center justify-center">
+        <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+          <i data-lucide="globe" class="w-5 h-5 text-brand-400"></i>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-base lg:text-lg font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-brand-300">
+            SPATIA 3D
+          </h1>
+          <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20">
+            Square Edge-to-Edge &bull; Zero Ghosting
+          </span>
+        </div>
+        <p class="text-[11px] text-slate-400 hidden sm:block">Edge-Touching Square Photo Projections, 0% Ghosting, 16x Anisotropic Filtering & 3D Spatial Navigation</p>
+      </div>
+    </div>
+
+    <!-- Right Controls / Preset Demos -->
+    <div class="flex items-center gap-2.5">
+      <div class="dropdown relative group">
+        <button id="demoBtn" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-200 hover:text-white transition-all shadow-sm">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>Sample Demos</span>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+        </button>
+        <div class="absolute right-0 mt-1.5 w-64 py-1.5 bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-2xl shadow-2xl hidden group-hover:block z-50 animate-in fade-in zoom-in-95">
+          <button onclick="loadSampleDataset('room')" class="w-full text-left px-3.5 py-2 hover:bg-brand-600/20 flex items-start gap-2.5 text-xs text-slate-200 hover:text-white transition-colors">
+            <span class="text-base">🛋️</span>
+            <div>
+              <div class="font-bold">Living Room & Office (6 Square Views)</div>
+              <div class="text-[10px] text-slate-400">60° angular square sectors touching edge-to-edge</div>
+            </div>
+          </button>
+          <button onclick="loadSampleDataset('temple')" class="w-full text-left px-3.5 py-2 hover:bg-brand-600/20 flex items-start gap-2.5 text-xs text-slate-200 hover:text-white transition-colors">
+            <span class="text-base">🏛️</span>
+            <div>
+              <div class="font-bold">Temple Sanctuary (6 Cube Faces)</div>
+              <div class="text-[10px] text-slate-400">Exact 90° square faces touching along all seams</div>
+            </div>
+          </button>
+          <button onclick="loadSampleDataset('loft')" class="w-full text-left px-3.5 py-2 hover:bg-brand-600/20 flex items-start gap-2.5 text-xs text-slate-200 hover:text-white transition-colors">
+            <span class="text-base">🏙️</span>
+            <div>
+              <div class="font-bold">City Loft 360° (8 Square Views)</div>
+              <div class="text-[10px] text-slate-400">45° angular square sectors with zero ghosting</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <button onclick="resetAll()" class="p-2 rounded-xl bg-slate-900 hover:bg-red-500/10 border border-slate-700 hover:border-red-500/40 text-slate-400 hover:text-red-400 transition-all text-xs" title="Reset All Images">
+        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+      </button>
+
+      <a href="#aboutSection" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-all text-xs" title="About Algorithm">
+        <i data-lucide="info" class="w-4 h-4"></i>
+      </a>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN WORKSPACE -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 space-y-6">
+
+    <!-- TOP ROW: Mode Selector & Stitch Action -->
+    <div class="glass-card rounded-3xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-brand-500/15 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-brand-950/40">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center shrink-0">
+          <i data-lucide="square" class="w-5 h-5 text-brand-400"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-white">Square Edge-to-Edge Stitching Engine</h2>
+            <span class="text-[10px] bg-brand-500/20 text-brand-300 px-2 py-0.5 rounded-full font-mono font-bold">Square 1:1</span>
+            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-mono font-bold">0% Ghosting</span>
+          </div>
+          <p class="text-xs text-slate-400">Photos are framed as 1:1 squares with edges touching seamlessly at exact sector boundaries with zero ghosting.</p>
+        </div>
+      </div>
+
+      <!-- Stitch Mode Selector & Actions -->
+      <div class="flex items-center flex-wrap gap-2.5 w-full md:w-auto">
+        
+        <!-- Auto-Detect Directions Button -->
+        <button onclick="autoDetectDirections()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-brand-300 hover:text-white transition-all shadow-sm" title="Automatically detect circular order and assign directions to dropdowns">
+          <i data-lucide="wand-2" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>Auto-Detect Directions</span>
+        </button>
+
+        <!-- Primary Action: Stitch Button -->
+        <button id="stitchBtn" onclick="runStitchingProcess()" class="flex items-center justify-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 hover:from-brand-500 hover:to-cyan-400 text-white font-bold text-xs shadow-lg shadow-brand-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span>Stitch 360° Panorama</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- MAIN TWO-COLUMN WORKFLOW -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT COLUMN (5 cols): Photo Sequence & Direction Selectors -->
+      <div class="lg:col-span-5 space-y-4">
+        
+        <!-- Batch Upload Zone -->
+        <div id="dropZone" class="glass-card border-2 border-dashed border-slate-700 hover:border-brand-400 rounded-3xl p-5 text-center transition-all cursor-pointer group relative overflow-hidden">
+          <input type="file" id="fileInput" multiple accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-20" />
+          
+          <div class="flex flex-col items-center justify-center space-y-2 pointer-events-none">
+            <div class="w-10 h-10 rounded-2xl bg-brand-500/10 group-hover:bg-brand-500/20 text-brand-400 flex items-center justify-center transition-all group-hover:scale-110">
+              <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-slate-200 group-hover:text-brand-300">
+                Drop 5 to 10 Photos Here (or Click to Browse)
+              </p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Photos are automatically standardized as square 1:1 images</p>
+            </div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-800/80 border border-slate-700 text-[10px] text-slate-300 font-mono">
+              <span id="photoCountBadge">0 Photos Loaded</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direction Assignment & Sequence Manager -->
+        <div class="glass-panel rounded-3xl p-4 space-y-3">
+          
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="compass" class="w-4 h-4 text-brand-400"></i>
+              <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Photo Directions & Sequence</h3>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="reversePhotoSequence()" class="p-1 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-[10px] text-slate-300 font-mono flex items-center gap-1" title="Reverse sequence order">
+                <i data-lucide="refresh-cw" class="w-3 h-3 text-cyan-400"></i>
+                <span>Reverse</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- List of Photo Cards with Individual Direction Selectors (SQUARE THUMBNAILS) -->
+          <div class="space-y-2.5 max-h-[310px] overflow-y-auto pr-1" id="photoSequenceList">
+            <!-- Dynamic Photo Cards with Direction Dropdowns -->
+            <div class="p-6 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
+              No photos uploaded yet. Drop 5~10 photos above or click Sample Demos.
+            </div>
+          </div>
+
+          <!-- Fine-Tuning Sliders (FOV & Edge Touching Controls) -->
+          <div class="pt-3 border-t border-slate-800 space-y-2.5 text-xs text-slate-400">
+            
+            <!-- Camera Field of View Slider -->
+            <div class="flex items-center justify-between">
+              <label class="flex items-center gap-1.5 font-medium text-slate-300">
+                <i data-lucide="maximize" class="w-3.5 h-3.5 text-brand-400"></i>
+                <span>Camera Field of View (FOV):</span>
+              </label>
+              <span class="font-mono text-brand-400 font-bold" id="fovSliderVal">Auto (Edge-Locked)</span>
+            </div>
+            <input type="range" id="cameraFovSlider" min="45" max="90" value="60" step="1" oninput="updateCameraFov(this.value)" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-500" />
+            <div class="flex justify-between text-[9px] text-slate-500 font-mono">
+              <span>Auto Sector Lock</span>
+              <span>Exact Edge Touch</span>
+              <span>90° (Wide Cube)</span>
+            </div>
+
+            <!-- Smart Floor / Ceiling Extension Toggle -->
+            <div class="flex items-center justify-between pt-1">
+              <span class="flex items-center gap-1.5 text-slate-300">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>Smart Ambient Floor & Ceiling Fill:</span>
+              </span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="smartPolesToggle" checked class="sr-only peer" onchange="runStitchingProcess()">
+                <div class="w-8 h-4 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-brand-600"></div>
+              </label>
+            </div>
+            <p class="text-[10px] text-slate-500">Automatically blends top & bottom polar caps seamlessly when no ceiling/floor photo is uploaded.</p>
+
+          </div>
+
+        </div>
+
+        <!-- Stitching Progress Banner -->
+        <div id="progressCard" class="glass-card rounded-2xl p-4 border border-brand-500/30 hidden space-y-2.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-brand-300 flex items-center gap-2" id="progressLabel">
+              <div class="w-2 h-2 rounded-full bg-brand-400 animate-ping"></div>
+              Stitching Edge-to-Edge 4K Panorama...
+            </span>
+            <span class="font-mono text-brand-400 font-bold" id="progressPercent">0%</span>
+          </div>
+          <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+            <div id="progressBar" class="h-full bg-gradient-to-r from-brand-500 to-cyan-400 w-0 transition-all duration-150"></div>
+          </div>
+          <p class="text-[10px] text-slate-400 font-mono" id="progressDetail">Applying zero-ghosting edge-touching ray projection...</p>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN (7 cols): Interactive 3D Viewport (Google Sphere & Photo Tourism) -->
+      <div class="lg:col-span-7 space-y-4">
+        
+        <!-- Viewer Container Card -->
+        <div class="glass-panel rounded-3xl overflow-hidden border border-slate-800 shadow-2xl relative flex flex-col h-[660px]">
+          
+          <!-- Viewport Header Toolbar -->
+          <div class="px-4 py-2.5 border-b border-slate-800/80 flex items-center justify-between bg-slate-950/80 backdrop-blur-md z-10">
+            
+            <!-- Mode Switch Tabs -->
+            <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-2xl border border-slate-800">
+              <button id="tabSphere" onclick="switchViewerMode('sphere')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 bg-brand-600 text-white shadow-sm">
+                <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+                <span>Google Photo Sphere</span>
+              </button>
+              <button id="tabTourism" onclick="switchViewerMode('tourism')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+                <i data-lucide="camera" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>Photo Tourism 3D</span>
+              </button>
+              <button id="tabCross" onclick="switchViewerMode('cross')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+                <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>Cross Layout</span>
+              </button>
+            </div>
+
+            <!-- Heading Azimuth HUD Pill -->
+            <div class="flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-900/90 border border-slate-800 text-xs font-mono text-slate-200">
+              <i data-lucide="compass" class="w-3.5 h-3.5 text-brand-400"></i>
+              <span id="headingText">N (0°)</span>
+            </div>
+          </div>
+
+          <!-- 3D Canvas Mount Point -->
+          <div class="relative flex-1 bg-slate-950 overflow-hidden canvas-container" id="canvasMount">
+            
+            <!-- Canvas Placeholder (when no stitched sphere is loaded yet) -->
+            <div id="emptyViewerState" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
+              <div class="w-16 h-16 rounded-3xl bg-slate-900 border border-slate-800 flex items-center justify-center mb-3 text-slate-500 shadow-xl">
+                <i data-lucide="eye" class="w-8 h-8"></i>
+              </div>
+              <h4 class="text-sm font-bold text-slate-300">Ready to Stitch Square Edge-to-Edge Sphere</h4>
+              <p class="text-xs text-slate-400 max-w-sm mt-1">Upload 5~10 photos or click <b>"Sample Demos"</b> in the top navbar to see square photos touching edges with zero ghosting!</p>
+              <div class="flex items-center gap-2 mt-4">
+                <button onclick="loadSampleDataset('room')" class="px-4 py-2 rounded-xl bg-brand-600/20 hover:bg-brand-600/30 text-brand-300 border border-brand-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors">
+                  <span>🛋️ Living Room Demo</span>
+                </button>
+                <button onclick="loadSampleDataset('temple')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors">
+                  <span>🏛️ Temple Demo</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Cross Cubemap Layout Container (hidden by default) -->
+            <div id="crossLayoutContainer" class="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center p-4 overflow-auto hidden z-20">
+              <img id="crossImg" class="max-w-full max-h-[500px] object-contain rounded-2xl border border-slate-800 shadow-2xl" alt="Cross Cubemap Layout" />
+            </div>
+
+            <!-- Floating Top Compass HUD Widget -->
+            <div id="compassWidget" class="absolute top-3 left-3 px-3.5 py-2 rounded-2xl glass-panel text-white shadow-xl flex items-center gap-3 z-20 pointer-events-none">
+              <div class="relative w-8 h-8 rounded-full border border-brand-500/40 flex items-center justify-center bg-slate-900/80">
+                <div id="compassNeedle" class="w-1 h-6 bg-gradient-to-t from-red-500 to-brand-400 rounded-full transition-transform duration-75"></div>
+              </div>
+              <div>
+                <div class="text-[11px] font-bold" id="compassTitle">360° Sphere Orbit</div>
+                <div class="text-[9px] text-slate-400 font-mono" id="fovReadout">Square 1:1 &bull; 0% Ghosting &bull; 16x Anisotropic</div>
+              </div>
+            </div>
+
+            <!-- Photo Tourism Frustum Selected Hint Banner -->
+            <div id="tourismBanner" class="absolute top-3 right-3 px-3.5 py-1.5 rounded-2xl glass-panel border-amber-500/30 text-amber-300 text-xs font-bold shadow-xl hidden z-20 flex items-center gap-2">
+              <i data-lucide="camera" class="w-4 h-4 text-amber-400"></i>
+              <span id="tourismBannerText">Click any square camera pyramid to fly into photo!</span>
+            </div>
+
+            <!-- Bottom Floating Control Bar -->
+            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-2 rounded-2xl glass-panel shadow-2xl z-20 flex-wrap justify-center">
+              
+              <!-- Auto Rotate / Tour Mode -->
+              <button id="autoRotateBtn" onclick="toggleAutoRotate()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition-colors flex items-center gap-1.5 text-xs font-semibold" title="Toggle Auto 360° Tour Spin">
+                <i data-lucide="play" class="w-3.5 h-3.5 text-emerald-400" id="rotateIcon"></i>
+                <span class="hidden sm:inline">Tour Spin</span>
+              </button>
+
+              <!-- Live Brightness / Exposure Slider -->
+              <div class="flex items-center gap-1.5 bg-slate-900 rounded-xl px-2.5 py-1.5 border border-slate-800 text-xs">
+                <i data-lucide="sun" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+                <span class="text-[10px] text-slate-400 hidden md:inline">Brightness:</span>
+                <input type="range" id="brightnessSlider" min="50" max="250" value="125" step="5" oninput="updateSphereBrightness(this.value)" class="w-16 sm:w-20 h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-amber-400" />
+                <span class="font-mono text-[10px] text-amber-300 font-bold" id="brightnessVal">125%</span>
+              </div>
+
+              <!-- Zoom In / Out FOV -->
+              <div class="flex items-center gap-1 bg-slate-900 rounded-xl p-0.5 border border-slate-800">
+                <button onclick="adjustFov(-10)" class="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white" title="Zoom In">
+                  <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="adjustFov(10)" class="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white" title="Zoom Out">
+                  <i data-lucide="zoom-out" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+
+              <!-- Reset Camera View -->
+              <button onclick="resetCameraOrientation()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition-colors" title="Reset View (North 0°)">
+                <i data-lucide="compass" class="w-3.5 h-3.5 text-brand-400"></i>
+              </button>
+
+              <!-- Download Stitched Equirectangular JPEG -->
+              <button id="downloadBtn" onclick="downloadEquirectangular()" disabled class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition-colors disabled:opacity-40 disabled:pointer-events-none" title="Download 360° Panorama JPG">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-400"></i>
+              </button>
+
+              <!-- Fullscreen Toggle -->
+              <button onclick="toggleFullscreen()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition-colors" title="Toggle Fullscreen">
+                <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- ALGORITHM & TECHNICAL EXPLANATION SECTION -->
+    <!-- ========================================================================= -->
+    <section id="aboutSection" class="glass-panel rounded-3xl p-6 space-y-4 border border-slate-800">
+      <div class="flex items-center gap-2">
+        <i data-lucide="layers" class="w-5 h-5 text-brand-400"></i>
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider">How the Square Edge-to-Edge Zero-Ghosting Pipeline Works</h3>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-400">
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+          <div class="font-bold text-brand-300 flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center font-mono text-[10px]">1</span>
+            Square 1:1 Standardization
+          </div>
+          <p>Every photo is cropped/framed as a pure square (\(1:1\) aspect ratio) and projected with matching square focal lengths so each photo covers its exact angular sector without stretching.</p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+          <div class="font-bold text-brand-300 flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center font-mono text-[10px]">2</span>
+            Exact Edge-Touching Boundaries
+          </div>
+          <p>For \(N\) photos around 360°, each photo spans an exact angular width \(\Delta\theta = \frac{360^\circ}{N}\). The right edge of photo \(k\) meets and touches the left edge of photo \(k+1\) seamlessly.</p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+          <div class="font-bold text-brand-300 flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center font-mono text-[10px]">3</span>
+            100% Zero-Ghosting Ray Assignment
+          </div>
+          <p>Each spherical pixel \((\theta, \phi)\) is sampled from its designated photo sector with crisp subpixel bilinear filtering. Because multiple photos are never averaged together, ghosting is completely eliminated.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- FOOTER -->
+  <!-- ========================================================================= -->
+  <footer class="w-full border-t border-slate-800/80 py-4 px-6 text-center text-xs text-slate-500">
+    SPATIA 3D &bull; Square Edge-to-Edge 4K Immersive Reconstruction Engine &bull; Pure Client-Side WebGL
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- COMPLETE JAVASCRIPT ENGINE -->
+  <!-- ========================================================================= -->
+  <script>
+    // ---------------------------------------------------------------------------
+    // DIRECTION OPTIONS & STATE
+    // ---------------------------------------------------------------------------
+    const DIRECTION_OPTIONS = [
+      { id: 'north', label: 'North (0° - Front)', yaw: 0, pitch: 0, type: 'horizon' },
+      { id: 'ne',    label: 'North-East (45°)',   yaw: 45, pitch: 0, type: 'horizon' },
+      { id: 'east',  label: 'East (90° - Right)',  yaw: 90, pitch: 0, type: 'horizon' },
+      { id: 'se',    label: 'South-East (135°)',  yaw: 135, pitch: 0, type: 'horizon' },
+      { id: 'south', label: 'South (180° - Back)', yaw: 180, pitch: 0, type: 'horizon' },
+      { id: 'sw',    label: 'South-West (225°)',  yaw: 225, pitch: 0, type: 'horizon' },
+      { id: 'west',  label: 'West (270° - Left)',  yaw: 270, pitch: 0, type: 'horizon' },
+      { id: 'nw',    label: 'North-West (315°)',  yaw: 315, pitch: 0, type: 'horizon' },
+      { id: 'up',    label: 'Up (Ceiling / Dome)', yaw: 0, pitch: 90, type: 'up' },
+      { id: 'down',  label: 'Down (Floor / Ground)', yaw: 0, pitch: -90, type: 'down' },
+    ];
+
+    // Array of photo items: [ { id, file, imgElement, dataUrl, name, directionKey, yaw, pitch, type } ]
+    let photoItems = [];
+    let customCameraFov = 0; // 0 means automatic edge-locked FOV (360 / N)
+    let sphereBrightnessMultiplier = 1.25;
+
+    // Stitched outputs
+    let stitchedEquirectCanvas = null;
+    let stitchedCrossCanvas = null;
+    let stitchedTexture = null;
+
+    // Current Viewer Mode: 'sphere' | 'tourism' | 'cross'
+    let currentViewMode = 'sphere';
+    let isAutoRotating = false;
+    let autoRotateSpeed = 0.003;
+
+    // Three.js State
+    let scene, camera, renderer, orbitControls;
+    let sphereMesh = null;
+    let tourismGroup = null;
+    let frustumObjects = [];
+    let isTransitioningCamera = false;
+
+    // Sphere interaction controls
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    let lon = 0, lat = 0, phi = 0, theta = 0;
+    let targetFov = 75;
+    let currentFov = 75;
+
+    // ---------------------------------------------------------------------------
+    // INITIALIZATION
+    // ---------------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initThreeScene();
+      setupDropZone();
+    });
+
+    function updateCameraFov(val) {
+      customCameraFov = parseFloat(val);
+      document.getElementById('fovSliderVal').innerText = `${customCameraFov}° (Edge-Locked)`;
+      if (photoItems.length >= 2) {
+        runStitchingProcess();
+      }
+    }
+
+    function updateSphereBrightness(val) {
+      sphereBrightnessMultiplier = parseFloat(val) / 100.0;
+      document.getElementById('brightnessVal').innerText = `${Math.round(val)}%`;
+      if (sphereMesh && sphereMesh.material) {
+        const b = Math.min(1.0, sphereBrightnessMultiplier);
+        sphereMesh.material.color.setRGB(b, b, b);
+        if (renderer) {
+          renderer.toneMappingExposure = sphereBrightnessMultiplier;
+        }
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // STANDARDIZE ANY IMAGE TO PURE SQUARE 1:1
+    // ---------------------------------------------------------------------------
+    function standardizeToSquare(imgElement, targetSize = 1024) {
+      const canvas = document.createElement('canvas');
+      canvas.width = targetSize;
+      canvas.height = targetSize;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      const sw = imgElement.width || targetSize;
+      const sh = imgElement.height || targetSize;
+      const minDim = Math.min(sw, sh);
+      const sx = (sw - minDim) / 2;
+      const sy = (sh - minDim) / 2;
+
+      ctx.drawImage(imgElement, sx, sy, minDim, minDim, 0, 0, targetSize, targetSize);
+      return canvas;
+    }
+
+    // ---------------------------------------------------------------------------
+    // DROP ZONE & FILE UPLOAD HANDLING (SQUARE 1:1 NORMALIZATION)
+    // ---------------------------------------------------------------------------
+    function setupDropZone() {
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+
+      ['dragenter', 'dragover'].forEach(name => {
+        dropZone.addEventListener(name, (e) => {
+          e.preventDefault();
+          dropZone.classList.add('border-brand-400', 'bg-brand-500/5');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(name => {
+        dropZone.addEventListener(name, (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('border-brand-400', 'bg-brand-500/5');
+        });
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+        handleUploadedFiles(files);
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+        handleUploadedFiles(files);
+      });
+    }
+
+    async function handleUploadedFiles(files) {
+      if (!files.length) return;
+
+      const defaultDirKeys = ['north', 'east', 'south', 'west', 'up', 'down', 'ne', 'se', 'sw', 'nw'];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const assignedKey = defaultDirKeys[photoItems.length % defaultDirKeys.length];
+        await addPhotoItem(file, file.name, assignedKey);
+      }
+
+      autoDetectDirections();
+    }
+
+    function addPhotoItem(fileOrBlob, name, directionKey = 'north') {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const rawImg = new Image();
+          rawImg.onload = () => {
+            // Standardize raw photo to high-res 1024x1024 square image
+            const squareCanvas = standardizeToSquare(rawImg, 1024);
+            const squareDataUrl = squareCanvas.toDataURL('image/jpeg', 0.96);
+            const dirMeta = DIRECTION_OPTIONS.find(d => d.id === directionKey) || DIRECTION_OPTIONS[0];
+
+            photoItems.push({
+              id: 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+              file: fileOrBlob,
+              imgElement: squareCanvas,
+              dataUrl: squareDataUrl,
+              name: name,
+              directionKey: dirMeta.id,
+              yaw: dirMeta.yaw,
+              pitch: dirMeta.pitch,
+              type: dirMeta.type
+            });
+            resolve();
+          };
+          rawImg.src = e.target.result;
+        };
+        reader.readAsDataURL(fileOrBlob);
+      });
+    }
+
+    // ---------------------------------------------------------------------------
+    // RENDER PHOTO LIST WITH SQUARE THUMBNAILS
+    // ---------------------------------------------------------------------------
+    function renderPhotoSequenceList() {
+      const container = document.getElementById('photoSequenceList');
+      const countBadge = document.getElementById('photoCountBadge');
+      countBadge.innerText = `${photoItems.length} Photos Loaded (Square 1:1)`;
+
+      if (!photoItems.length) {
+        container.innerHTML = `
+          <div class="p-6 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
+            No photos uploaded yet. Drop 5~10 photos above or click Sample Demos.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+
+      photoItems.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'glass-card rounded-2xl p-2.5 flex items-center justify-between border border-slate-800/80 hover:border-brand-500/40 transition-all text-xs';
+        
+        let optionsHtml = '';
+        DIRECTION_OPTIONS.forEach(opt => {
+          const isSelected = item.directionKey === opt.id ? 'selected' : '';
+          optionsHtml += `<option value="${opt.id}" ${isSelected} class="bg-slate-900 text-slate-200">${opt.label}</option>`;
+        });
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            <div class="w-6 h-6 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center font-mono font-bold text-brand-400 text-[11px] shrink-0">
+              #${index + 1}
+            </div>
+            <!-- Pure Square Thumbnail -->
+            <div class="w-12 h-12 rounded-xl overflow-hidden bg-slate-900 border border-slate-700 shrink-0 aspect-square shadow-sm">
+              <img src="${item.dataUrl}" class="w-full h-full object-cover" alt="Square Photo ${index + 1}" />
+            </div>
+            <div class="space-y-1 min-w-0 flex-1">
+              <div class="font-bold text-slate-200 truncate max-w-[130px] flex items-center gap-1.5">
+                <span>${item.name}</span>
+                <span class="text-[9px] bg-slate-800 text-brand-400 px-1 py-0.2 rounded font-mono">1:1</span>
+              </div>
+              
+              <!-- Interactive Direction Dropdown -->
+              <div class="flex items-center gap-1.5">
+                <select onchange="changePhotoDirection(${index}, this.value)" class="bg-slate-900 border border-slate-700 hover:border-brand-400 text-brand-300 font-bold rounded-lg px-2 py-0.5 text-[10px] focus:outline-none focus:ring-1 focus:ring-brand-500 cursor-pointer">
+                  ${optionsHtml}
+                </select>
+                <span class="text-[9px] text-slate-400 font-mono">${item.yaw}° Azimuth</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls: Move Left / Right & Delete -->
+          <div class="flex items-center gap-1 shrink-0 ml-2">
+            <button onclick="movePhoto(${index}, -1)" ${index === 0 ? 'disabled' : ''} class="p-1 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white" title="Move earlier">
+              <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="movePhoto(${index}, 1)" ${index === photoItems.length - 1 ? 'disabled' : ''} class="p-1 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white" title="Move later">
+              <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="deletePhoto(${index})" class="p-1 rounded-lg bg-slate-900 hover:bg-red-500/20 text-slate-500 hover:text-red-400 transition-colors" title="Remove photo">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    function changePhotoDirection(index, directionKey) {
+      const dirMeta = DIRECTION_OPTIONS.find(d => d.id === directionKey);
+      if (!dirMeta) return;
+
+      photoItems[index].directionKey = dirMeta.id;
+      photoItems[index].yaw = dirMeta.yaw;
+      photoItems[index].pitch = dirMeta.pitch;
+      photoItems[index].type = dirMeta.type;
+
+      renderPhotoSequenceList();
+      runStitchingProcess();
+    }
+
+    function movePhoto(index, delta) {
+      const targetIdx = index + delta;
+      if (targetIdx < 0 || targetIdx >= photoItems.length) return;
+      const temp = photoItems[index];
+      photoItems[index] = photoItems[targetIdx];
+      photoItems[targetIdx] = temp;
+      renderPhotoSequenceList();
+      runStitchingProcess();
+    }
+
+    function deletePhoto(index) {
+      photoItems.splice(index, 1);
+      renderPhotoSequenceList();
+      if (photoItems.length >= 1) {
+        runStitchingProcess();
+      } else {
+        document.getElementById('emptyViewerState').classList.remove('hidden');
+        if (sphereMesh) sphereMesh.visible = false;
+        if (tourismGroup) tourismGroup.visible = false;
+      }
+    }
+
+    function reversePhotoSequence() {
+      photoItems.reverse();
+      const N = photoItems.length;
+      photoItems.forEach((item, idx) => {
+        if (item.type === 'horizon') {
+          const targetAngle = Math.round((idx / N) * 360);
+          let bestOpt = DIRECTION_OPTIONS[0];
+          let minDiff = 360;
+          DIRECTION_OPTIONS.forEach(opt => {
+            if (opt.type === 'horizon') {
+              const diff = Math.abs(opt.yaw - targetAngle);
+              if (diff < minDiff) {
+                minDiff = diff;
+                bestOpt = opt;
+              }
+            }
+          });
+          item.directionKey = bestOpt.id;
+          item.yaw = targetAngle;
+        }
+      });
+      renderPhotoSequenceList();
+      runStitchingProcess();
+    }
+
+    function resetAll() {
+      photoItems = [];
+      renderPhotoSequenceList();
+      document.getElementById('emptyViewerState').classList.remove('hidden');
+      document.getElementById('downloadBtn').disabled = true;
+      if (sphereMesh) sphereMesh.visible = false;
+      if (tourismGroup) tourismGroup.visible = false;
+    }
+
+    // ---------------------------------------------------------------------------
+    // AUTO-DETECT DIRECTIONS & EQUAL SECTOR ALLOCATION
+    // ---------------------------------------------------------------------------
+    function autoDetectDirections() {
+      if (!photoItems.length) return;
+
+      const N = photoItems.length;
+      const dirOptionsHorizon = DIRECTION_OPTIONS.filter(d => d.type === 'horizon');
+
+      photoItems.forEach((item, idx) => {
+        const angleDeg = Math.round((idx / N) * 360);
+        item.yaw = angleDeg;
+        item.pitch = 0;
+
+        let bestDir = dirOptionsHorizon[0];
+        let minDiff = 360;
+        dirOptionsHorizon.forEach(opt => {
+          let diff = Math.abs(opt.yaw - angleDeg);
+          if (diff > 180) diff = 360 - diff;
+          if (diff < minDiff) {
+            minDiff = diff;
+            bestDir = opt;
+          }
+        });
+
+        item.directionKey = bestDir.id;
+        item.type = 'horizon';
+      });
+
+      renderPhotoSequenceList();
+      runStitchingProcess();
+    }
+
+    // ---------------------------------------------------------------------------
+    // SAMPLE DEMO DATASETS (PURE 1024x1024 SQUARE GENERATION)
+    // ---------------------------------------------------------------------------
+    async function loadSampleDataset(type) {
+      photoItems = [];
+      const res = 1024; // Pure 1024x1024 Square
+
+      if (type === 'temple') {
+        const cardinalOrder = ['north', 'east', 'south', 'west', 'up', 'down'];
+        for (const faceKey of cardinalOrder) {
+          const dirMeta = DIRECTION_OPTIONS.find(d => d.id === faceKey);
+          const canvas = generateProceduralTempleFace(faceKey, res);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.96);
+          const blob = await (await fetch(dataUrl)).blob();
+
+          photoItems.push({
+            id: `demo_temple_${faceKey}`,
+            file: blob,
+            imgElement: canvas,
+            dataUrl: dataUrl,
+            name: `Temple ${faceKey.toUpperCase()}`,
+            directionKey: dirMeta.id,
+            yaw: dirMeta.yaw,
+            pitch: dirMeta.pitch,
+            type: dirMeta.type
+          });
+        }
+      } else if (type === 'room') {
+        const numPhotos = 6;
+        for (let i = 0; i < numPhotos; i++) {
+          const canvas = generateProceduralRoomSweepPhoto(i, numPhotos, res);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.96);
+          const blob = await (await fetch(dataUrl)).blob();
+          const angleDeg = Math.round((i / numPhotos) * 360);
+
+          let bestDir = DIRECTION_OPTIONS[0];
+          let minDiff = 360;
+          DIRECTION_OPTIONS.filter(d => d.type === 'horizon').forEach(opt => {
+            let diff = Math.abs(opt.yaw - angleDeg);
+            if (diff > 180) diff = 360 - diff;
+            if (diff < minDiff) { minDiff = diff; bestDir = opt; }
+          });
+
+          photoItems.push({
+            id: `demo_room_${i}`,
+            file: blob,
+            imgElement: canvas,
+            dataUrl: dataUrl,
+            name: `Room View ${i + 1}`,
+            directionKey: bestDir.id,
+            yaw: angleDeg,
+            pitch: 0,
+            type: 'horizon'
+          });
+        }
+      } else {
+        const numPhotos = 8;
+        for (let i = 0; i < numPhotos; i++) {
+          const canvas = generateProceduralLoftPhoto(i, numPhotos, res);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.96);
+          const blob = await (await fetch(dataUrl)).blob();
+          const angleDeg = Math.round((i / numPhotos) * 360);
+
+          let bestDir = DIRECTION_OPTIONS[0];
+          let minDiff = 360;
+          DIRECTION_OPTIONS.filter(d => d.type === 'horizon').forEach(opt => {
+            let diff = Math.abs(opt.yaw - angleDeg);
+            if (diff > 180) diff = 360 - diff;
+            if (diff < minDiff) { minDiff = diff; bestDir = opt; }
+          });
+
+          photoItems.push({
+            id: `demo_loft_${i}`,
+            file: blob,
+            imgElement: canvas,
+            dataUrl: dataUrl,
+            name: `Loft Photo ${i + 1}`,
+            directionKey: bestDir.id,
+            yaw: angleDeg,
+            pitch: 0,
+            type: 'horizon'
+          });
+        }
+      }
+
+      renderPhotoSequenceList();
+      runStitchingProcess();
+    }
+
+    // Procedural Room Multi-View Generator (Square 1024x1024)
+    function generateProceduralRoomSweepPhoto(index, total, size = 1024) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // Bright warm wall background
+      const wallGrad = ctx.createLinearGradient(0, 0, 0, size);
+      wallGrad.addColorStop(0, '#f8fafc');
+      wallGrad.addColorStop(0.3, '#f1f5f9');
+      wallGrad.addColorStop(1, '#e2e8f0');
+      ctx.fillStyle = wallGrad;
+      ctx.fillRect(0, 0, size, size);
+
+      // Bright modern ceiling
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size * 0.22);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(0, size * 0.22 - 4, size, 4);
+
+      // Warm natural oak wood flooring
+      const floorGrad = ctx.createLinearGradient(0, size * 0.68, 0, size);
+      floorGrad.addColorStop(0, '#b45309');
+      floorGrad.addColorStop(1, '#78350f');
+      ctx.fillStyle = floorGrad;
+      ctx.fillRect(0, size * 0.68, size, size * 0.32);
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.lineWidth = 2;
+      for (let y = size * 0.7; y < size; y += 28) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(size, y);
+        ctx.stroke();
+      }
+
+      // High-Contrast Distinct Furniture in each angular sector
+      if (index === 0) {
+        // Executive Workstation Desk & Dual Ultra-Wide Screens
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(size * 0.18, size * 0.44, size * 0.64, size * 0.24);
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(size * 0.22, size * 0.28, size * 0.26, size * 0.16);
+        ctx.fillStyle = '#0ea5e9';
+        ctx.fillRect(size * 0.52, size * 0.28, size * 0.26, size * 0.16);
+        ctx.fillStyle = '#ffffff';
+        for (let l = 0; l < 5; l++) {
+          ctx.fillRect(size * 0.24, size * 0.31 + l * 18, size * 0.18, 4);
+          ctx.fillRect(size * 0.54, size * 0.31 + l * 18, size * 0.18, 4);
+        }
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(size * 0.5, size * 0.62, size * 0.11, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (index === 1) {
+        // Wooden Bookcase with Books & Decor
+        ctx.fillStyle = '#78350f';
+        ctx.fillRect(size * 0.15, size * 0.22, size * 0.36, size * 0.46);
+        for (let sy = size * 0.28; sy < size * 0.68; sy += 44) {
+          ctx.fillStyle = '#f59e0b';
+          ctx.fillRect(size * 0.18, sy, size * 0.3, 10);
+        }
+        ctx.fillStyle = '#0284c7';
+        ctx.fillRect(size * 0.58, size * 0.26, size * 0.28, size * 0.24);
+        ctx.strokeStyle = '#f8fafc';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(size * 0.58, size * 0.26, size * 0.28, size * 0.24);
+      } else if (index === 2) {
+        // Large Sunlit Window with City View
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(size * 0.12, size * 0.22, size * 0.76, size * 0.46);
+        ctx.fillStyle = '#fef08a';
+        ctx.fillRect(size * 0.2, size * 0.38, size * 0.18, size * 0.22);
+        ctx.fillStyle = '#991b1b';
+        ctx.fillRect(size * 0.08, size * 0.2, size * 0.12, size * 0.5);
+        ctx.fillRect(size * 0.8, size * 0.2, size * 0.12, size * 0.5);
+      } else if (index === 3) {
+        // White Wardrobe & Entry Door
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(size * 0.15, size * 0.22, size * 0.45, size * 0.46);
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(size * 0.15, size * 0.22, size * 0.45, size * 0.46);
+        ctx.fillStyle = '#b45309';
+        ctx.fillRect(size * 0.66, size * 0.24, size * 0.24, size * 0.44);
+      } else if (index === 4) {
+        // Lounge Couch & Coffee Table
+        ctx.fillStyle = '#059669';
+        ctx.fillRect(size * 0.18, size * 0.46, size * 0.64, size * 0.22);
+        ctx.fillStyle = '#d97706';
+        ctx.fillRect(size * 0.3, size * 0.64, size * 0.4, size * 0.08);
+      } else {
+        // Air Conditioner Unit & Standing Lamp
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(size * 0.28, size * 0.26, size * 0.44, size * 0.12);
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.strokeRect(size * 0.28, size * 0.26, size * 0.44, size * 0.12);
+        ctx.fillStyle = '#fef08a';
+        ctx.beginPath();
+        ctx.arc(size * 0.8, size * 0.35, 30, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(size * 0.8, size * 0.35);
+        ctx.lineTo(size * 0.8, size * 0.68);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#0284c7';
+      ctx.font = 'bold 26px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`SQUARE VIEW: ${Math.round((index / total) * 360)}°`, size/2, size * 0.13);
+
+      return canvas;
+    }
+
+    function generateProceduralTempleFace(faceKey, size = 1024) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      if (faceKey === 'up') {
+        const grad = ctx.createRadialGradient(size/2, size/2, 30, size/2, size/2, size/2);
+        grad.addColorStop(0, '#fef08a');
+        grad.addColorStop(0.4, '#d97706');
+        grad.addColorStop(0.9, '#78350f');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, size, size);
+
+        ctx.strokeStyle = '#fef3c7';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.arc(size/2, size/2, size * 0.35, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 36px serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('CELESTIAL TEMPLE DOME', size/2, size/2);
+      } else if (faceKey === 'down') {
+        ctx.fillStyle = '#44403c';
+        ctx.fillRect(0, 0, size, size);
+        const tiles = 8;
+        const s = size / tiles;
+        for (let y = 0; y < tiles; y++) {
+          for (let x = 0; x < tiles; x++) {
+            ctx.fillStyle = (x + y) % 2 === 0 ? '#78716c' : '#292524';
+            ctx.fillRect(x * s + 3, y * s + 3, s - 6, s - 6);
+          }
+        }
+      } else {
+        const wallGrad = ctx.createLinearGradient(0, 0, 0, size);
+        wallGrad.addColorStop(0, '#92400e');
+        wallGrad.addColorStop(1, '#451a03');
+        ctx.fillStyle = wallGrad;
+        ctx.fillRect(0, 0, size, size);
+
+        ctx.fillStyle = '#78716c';
+        ctx.fillRect(size * 0.1, size * 0.2, size * 0.12, size * 0.8);
+        ctx.fillRect(size * 0.78, size * 0.2, size * 0.12, size * 0.8);
+
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.arc(size/2, size * 0.4, size * 0.28, Math.PI, 0, false);
+        ctx.stroke();
+
+        ctx.fillStyle = '#fef3c7';
+        ctx.font = 'bold 32px serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`TEMPLE • ${faceKey.toUpperCase()}`, size/2, size * 0.35);
+      }
+
+      return canvas;
+    }
+
+    function generateProceduralLoftPhoto(index, total, size = 1024) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, size, size);
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(size * 0.1, size * 0.18, size * 0.8, size * 0.65);
+
+      ctx.fillStyle = '#082f49';
+      for (let bx = size * 0.12; bx < size * 0.85; bx += 60) {
+        const bh = 120 + Math.sin(bx * 0.05 + index) * 90;
+        ctx.fillRect(bx, size * 0.83 - bh, 45, bh);
+      }
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 28px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`LOFT VIEW • ${Math.round((index / total) * 360)}°`, size/2, size * 0.26);
+
+      return canvas;
+    }
+
+    // ---------------------------------------------------------------------------
+    // COMPLETE SQUARE EDGE-TO-EDGE STITCHING (100% ZERO GHOSTING)
+    // ---------------------------------------------------------------------------
+    async function runStitchingProcess() {
+      if (photoItems.length < 1) {
+        alert('Please upload photos or select a sample demo dataset!');
+        return;
+      }
+
+      const progressCard = document.getElementById('progressCard');
+      const progressBar = document.getElementById('progressBar');
+      const progressPercent = document.getElementById('progressPercent');
+      const progressDetail = document.getElementById('progressDetail');
+
+      progressCard.classList.remove('hidden');
+      document.getElementById('stitchBtn').disabled = true;
+
+      const setProgress = (pct, detail) => {
+        progressBar.style.width = `${pct}%`;
+        progressPercent.innerText = `${pct}%`;
+        progressDetail.innerText = detail;
+      };
+
+      try {
+        setProgress(15, 'Standardizing square 1:1 aspect ratios...');
+        await new Promise(r => setTimeout(r, 20));
+
+        // 4K Ultra-HD Equirectangular resolution
+        const eqWidth = 4096;
+        const eqHeight = 2048;
+        const smartPoles = document.getElementById('smartPolesToggle').checked;
+
+        const hasUp = photoItems.some(p => p.directionKey === 'up');
+        const hasDown = photoItems.some(p => p.directionKey === 'down');
+        const hasCardinal4 = ['north', 'east', 'south', 'west'].every(k => photoItems.some(p => p.directionKey === k));
+
+        if (hasCardinal4 && (hasUp || hasDown)) {
+          // Mode A: 6-Face Exact Cube Mapping (100% Zero Ghosting, Exact Touching Cube Edges)
+          setProgress(45, 'Executing 6-face square cube projection with touching edges...');
+          await new Promise(r => setTimeout(r, 20));
+
+          const cubeFaces = extractStandardizedCubeFaces(photoItems, 1024);
+
+          setProgress(70, 'Mapping square faces to equirectangular with zero ghosting...');
+          await new Promise(r => setTimeout(r, 20));
+
+          stitchedEquirectCanvas = cubemapToEquirectangular(cubeFaces, eqWidth, eqHeight);
+          stitchedCrossCanvas = createCrossCubemapLayout(cubeFaces);
+          document.getElementById('crossImg').src = stitchedCrossCanvas.toDataURL('image/jpeg', 0.96);
+        } else {
+          // Mode B: Exact Angular Sector Edge-Touching Stitcher (100% Zero Ghosting)
+          setProgress(45, 'Executing square edge-to-edge optical ray-casting...');
+          await new Promise(r => setTimeout(r, 20));
+
+          stitchedEquirectCanvas = stitchSquareEdgeToEdgePanorama(photoItems, eqWidth, eqHeight, smartPoles);
+        }
+
+        setProgress(88, 'Updating 3D Photo Sphere & Square Camera Frustums...');
+        await new Promise(r => setTimeout(r, 20));
+
+        updateThreeTexture(stitchedEquirectCanvas);
+        updatePhotoTourismFrustums();
+
+        setProgress(100, 'Square Edge-to-Edge Stitching completed!');
+        await new Promise(r => setTimeout(r, 30));
+
+        document.getElementById('emptyViewerState').classList.add('hidden');
+        document.getElementById('downloadBtn').disabled = false;
+        progressCard.classList.add('hidden');
+      } catch (err) {
+        console.error('Stitching error:', err);
+        alert('Stitching error: ' + err.message);
+      } finally {
+        document.getElementById('stitchBtn').disabled = false;
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // CUBEMAP 6-FACE EXTRACTION (SQUARE 1:1, TOUCHING EDGES)
+    // ---------------------------------------------------------------------------
+    function extractStandardizedCubeFaces(items, faceSize = 1024) {
+      const faces = {};
+      const required = ['north', 'east', 'south', 'west', 'up', 'down'];
+
+      required.forEach(dirKey => {
+        const match = items.find(p => p.directionKey === dirKey);
+        if (match && match.imgElement) {
+          faces[dirKey] = standardizeFaceToSquare(match.imgElement, faceSize);
+        } else {
+          faces[dirKey] = synthesizeFallbackFace(dirKey, faceSize);
+        }
+      });
+
+      return faces;
+    }
+
+    function standardizeFaceToSquare(sourceImgOrCanvas, size) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      const sw = sourceImgOrCanvas.width || size;
+      const sh = sourceImgOrCanvas.height || size;
+      const minDim = Math.min(sw, sh);
+      const sx = (sw - minDim) / 2;
+      const sy = (sh - minDim) / 2;
+
+      ctx.drawImage(sourceImgOrCanvas, sx, sy, minDim, minDim, 0, 0, size, size);
+      return ctx.getImageData(0, 0, size, size);
+    }
+
+    function synthesizeFallbackFace(faceDirection, size) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      const isCeiling = faceDirection === 'up';
+      const grad = ctx.createRadialGradient(size/2, size/2, 20, size/2, size/2, size/2);
+      if (isCeiling) {
+        grad.addColorStop(0, '#f8fafc');
+        grad.addColorStop(1, '#cbd5e1');
+      } else {
+        grad.addColorStop(0, '#78350f');
+        grad.addColorStop(1, '#451a03');
+      }
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, size, size);
+
+      return ctx.getImageData(0, 0, size, size);
+    }
+
+    // Exact Zero-Ghosting 6-Face Cube Mapping
+    function cubemapToEquirectangular(faces, eqWidth, eqHeight) {
+      const canvas = document.createElement('canvas');
+      canvas.width = eqWidth;
+      canvas.height = eqHeight;
+      const ctx = canvas.getContext('2d');
+      const outImgData = ctx.createImageData(eqWidth, eqHeight);
+      const outData = outImgData.data;
+
+      const faceSize = faces.north.width;
+      const faceDatas = {
+        east: faces.east.data,
+        west: faces.west.data,
+        up: faces.up.data,
+        down: faces.down.data,
+        north: faces.north.data,
+        south: faces.south.data
+      };
+
+      const pi = Math.PI;
+      const eps = 1e-7;
+
+      for (let v = 0; v < eqHeight; v++) {
+        const phi = (0.5 - v / eqHeight) * pi;
+        const cosPhi = Math.cos(phi);
+        const sinPhi = Math.sin(phi);
+
+        for (let u = 0; u < eqWidth; u++) {
+          const theta = (u / eqWidth - 0.5) * 2.0 * pi;
+
+          const rx = cosPhi * Math.sin(theta);
+          const ry = sinPhi;
+          const rz = cosPhi * Math.cos(theta);
+
+          const absX = Math.abs(rx);
+          const absY = Math.abs(ry);
+          const absZ = Math.abs(rz);
+
+          let targetData;
+          let uf = 0, vf = 0;
+
+          // Exact Voronoi Cubemap Face Partitioning (Edges touch seamlessly, 0% ghosting)
+          if (absX >= absY && absX >= absZ) {
+            if (rx > 0) {
+              targetData = faceDatas.east;
+              uf = (-rz / (rx + eps) + 1.0) * 0.5;
+              vf = (-ry / (rx + eps) + 1.0) * 0.5;
+            } else {
+              targetData = faceDatas.west;
+              uf = (rz / (-rx + eps) + 1.0) * 0.5;
+              vf = (-ry / (-rx + eps) + 1.0) * 0.5;
+            }
+          } else if (absY >= absX && absY >= absZ) {
+            if (ry > 0) {
+              targetData = faceDatas.up;
+              uf = (rx / (ry + eps) + 1.0) * 0.5;
+              vf = (-rz / (ry + eps) + 1.0) * 0.5;
+            } else {
+              targetData = faceDatas.down;
+              uf = (rx / (-ry + eps) + 1.0) * 0.5;
+              vf = (rz / (-ry + eps) + 1.0) * 0.5;
+            }
+          } else {
+            if (rz > 0) {
+              targetData = faceDatas.north;
+              uf = (rx / (rz + eps) + 1.0) * 0.5;
+              vf = (-ry / (rz + eps) + 1.0) * 0.5;
+            } else {
+              targetData = faceDatas.south;
+              uf = (-rx / (-rz + eps) + 1.0) * 0.5;
+              vf = (-ry / (-rz + eps) + 1.0) * 0.5;
+            }
+          }
+
+          // Sharp Subpixel Bilinear Interpolation
+          const px = Math.max(0, Math.min(faceSize - 1, uf * (faceSize - 1)));
+          const py = Math.max(0, Math.min(faceSize - 1, vf * (faceSize - 1)));
+          const x0 = Math.floor(px);
+          const y0 = Math.floor(py);
+          const x1 = Math.min(faceSize - 1, x0 + 1);
+          const y1 = Math.min(faceSize - 1, y0 + 1);
+          const fx = px - x0;
+          const fy = py - y0;
+
+          const idx00 = (y0 * faceSize + x0) * 4;
+          const idx10 = (y0 * faceSize + x1) * 4;
+          const idx01 = (y1 * faceSize + x0) * 4;
+          const idx11 = (y1 * faceSize + x1) * 4;
+
+          const destIdx = (v * eqWidth + u) * 4;
+          for (let c = 0; c < 3; c++) {
+            const val = (1 - fx) * (1 - fy) * targetData[idx00 + c] +
+                        fx * (1 - fy) * targetData[idx10 + c] +
+                        (1 - fx) * fy * targetData[idx01 + c] +
+                        fx * fy * targetData[idx11 + c];
+            outData[destIdx + c] = Math.round(val);
+          }
+          outData[destIdx + 3] = 255;
+        }
+      }
+
+      ctx.putImageData(outImgData, 0, 0);
+      return canvas;
+    }
+
+    function createCrossCubemapLayout(faces) {
+      const s = 384;
+      const canvas = document.createElement('canvas');
+      canvas.width = s * 4;
+      canvas.height = s * 3;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      function drawFace(faceData, col, row, label) {
+        const tmp = document.createElement('canvas');
+        tmp.width = faceData.width;
+        tmp.height = faceData.height;
+        tmp.getContext('2d').putImageData(faceData, 0, 0);
+        ctx.drawImage(tmp, col * s, row * s, s, s);
+
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(col * s, row * s, s, s);
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.fillRect(col * s + 6, row * s + 6, 85, 22);
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 12px monospace';
+        ctx.fillText(label, col * s + 12, row * s + 22);
+      }
+
+      drawFace(faces.up, 1, 0, 'UP');
+      drawFace(faces.west, 0, 1, 'WEST');
+      drawFace(faces.north, 1, 1, 'NORTH');
+      drawFace(faces.east, 2, 1, 'EAST');
+      drawFace(faces.south, 3, 1, 'SOUTH');
+      drawFace(faces.down, 1, 2, 'DOWN');
+
+      return canvas;
+    }
+
+    // ---------------------------------------------------------------------------
+    // SQUARE EDGE-TO-EDGE ZERO-GHOSTING SPHERICAL STITCHER
+    // ---------------------------------------------------------------------------
+    function stitchSquareEdgeToEdgePanorama(photos, eqW, eqH, enableSmartPoles = true) {
+      const canvas = document.createElement('canvas');
+      canvas.width = eqW;
+      canvas.height = eqH;
+      const ctx = canvas.getContext('2d');
+      const outImgData = ctx.createImageData(eqW, eqH);
+      const outData = outImgData.data;
+
+      const N = photos.length;
+      const pi = Math.PI;
+
+      // Each photo covers an exact angular sector of 360° / N
+      // The right edge of photo k meets the left edge of photo k+1 seamlessly!
+      const sectorAngleRad = (2 * pi) / N;
+      const halfSectorRad = sectorAngleRad / 2;
+
+      // Extract square image buffers (standardized 1:1)
+      const photoBuffers = photos.map((item) => {
+        const squareImg = standardizeToSquare(item.imgElement, 1024);
+        const w = squareImg.width;
+        const h = squareImg.height; // Square: w == h
+
+        const tCtx = squareImg.getContext('2d');
+        const data = tCtx.getImageData(0, 0, w, h).data;
+
+        const yawRad = THREE.MathUtils.degToRad(item.yaw);
+        
+        // Exact pinhole focal length so that the photo spans exactly from -halfSector to +halfSector
+        const f = (w / 2) / Math.tan(halfSectorRad);
+
+        return { w, h, data, yawRad, f };
+      });
+
+      // Sample ambient top color (ceiling) and bottom color (floor)
+      let topR = 0, topG = 0, topB = 0;
+      let botR = 0, botG = 0, botB = 0;
+      photoBuffers.forEach(pb => {
+        for (let x = 0; x < pb.w; x += 15) {
+          const idx = x * 4;
+          topR += pb.data[idx];
+          topG += pb.data[idx+1];
+          topB += pb.data[idx+2];
+        }
+        for (let x = 0; x < pb.w; x += 15) {
+          const idx = ((pb.h - 1) * pb.w + x) * 4;
+          botR += pb.data[idx];
+          botG += pb.data[idx+1];
+          botB += pb.data[idx+2];
+        }
+      });
+      const sampleCount = (photoBuffers[0].w / 15) * N;
+      topR = Math.round(topR / sampleCount);
+      topG = Math.round(topG / sampleCount);
+      topB = Math.round(topB / sampleCount);
+      botR = Math.round(botR / sampleCount);
+      botG = Math.round(botG / sampleCount);
+      botB = Math.round(botB / sampleCount);
+
+      // Precalculate row trigonometric tables
+      const rowCosPhi = new Float32Array(eqH);
+      const rowSinPhi = new Float32Array(eqH);
+      const rowTanPhi = new Float32Array(eqH);
+      for (let v = 0; v < eqH; v++) {
+        const phi = (0.5 - v / eqH) * pi;
+        rowCosPhi[v] = Math.cos(phi);
+        rowSinPhi[v] = Math.sin(phi);
+        rowTanPhi[v] = Math.tan(phi);
+      }
+
+      // Precalculate column theta
+      const colTheta = new Float32Array(eqW);
+      for (let u = 0; u < eqW; u++) {
+        colTheta[u] = (u / eqW - 0.5) * 2.0 * pi;
+      }
+
+      for (let v = 0; v < eqH; v++) {
+        const tanPhi = rowTanPhi[v];
+        const vOffset = v * eqW;
+
+        for (let u = 0; u < eqW; u++) {
+          const theta = colTheta[u];
+
+          // 1. Find the unique active photo sector (Zero-Ghosting Nearest-Center Partition)
+          let bestK = 0;
+          let minDTheta = Infinity;
+          let bestDTheta = 0;
+
+          for (let k = 0; k < N; k++) {
+            let dTheta = theta - photoBuffers[k].yawRad;
+            while (dTheta > pi) dTheta -= 2 * pi;
+            while (dTheta < -pi) dTheta += 2 * pi;
+
+            const absD = Math.abs(dTheta);
+            if (absD < minDTheta) {
+              minDTheta = absD;
+              bestK = k;
+              bestDTheta = dTheta;
+            }
+          }
+
+          const pb = photoBuffers[bestK];
+          const cosDTheta = Math.cos(bestDTheta);
+
+          // 2. Project ray onto square photo plane
+          // At bestDTheta = -halfSector -> xc = 0 (Left Edge)
+          // At bestDTheta = +halfSector -> xc = w (Right Edge)
+          // The edges touch seamlessly without gap or ghosting!
+          const xc = Math.tan(bestDTheta) * pb.f + pb.w / 2;
+          const yc = -tanPhi * (pb.f / Math.max(cosDTheta, 0.01)) + pb.h / 2;
+
+          const outIdx = (vOffset + u) * 4;
+
+          if (xc >= 0 && xc < pb.w && yc >= 0 && yc < pb.h) {
+            // Subpixel Bilinear Interpolation on active square photo
+            const x0 = Math.floor(xc);
+            const y0 = Math.floor(yc);
+            const x1 = Math.min(pb.w - 1, x0 + 1);
+            const y1 = Math.min(pb.h - 1, y0 + 1);
+            const fx = xc - x0;
+            const fy = yc - y0;
+
+            const idx00 = (y0 * pb.w + x0) * 4;
+            const idx10 = (y0 * pb.w + x1) * 4;
+            const idx01 = (y1 * pb.w + x0) * 4;
+            const idx11 = (y1 * pb.w + x1) * 4;
+
+            const r = (1 - fx) * (1 - fy) * pb.data[idx00] + fx * (1 - fy) * pb.data[idx10] + (1 - fx) * fy * pb.data[idx01] + fx * fy * pb.data[idx11];
+            const g = (1 - fx) * (1 - fy) * pb.data[idx00+1] + fx * (1 - fy) * pb.data[idx10+1] + (1 - fx) * fy * pb.data[idx01+1] + fx * fy * pb.data[idx11+1];
+            const b = (1 - fx) * (1 - fy) * pb.data[idx00+2] + fx * (1 - fy) * pb.data[idx10+2] + (1 - fx) * fy * pb.data[idx01+2] + fx * fy * pb.data[idx11+2];
+
+            outData[outIdx]     = Math.min(255, Math.max(0, Math.round(r)));
+            outData[outIdx + 1] = Math.min(255, Math.max(0, Math.round(g)));
+            outData[outIdx + 2] = Math.min(255, Math.max(0, Math.round(b)));
+            outData[outIdx + 3] = 255;
+          } else {
+            // Polar region beyond square photo vertical reach -> Smart Ambient Fill
+            if (enableSmartPoles) {
+              const isCeiling = (0.5 - v / eqH) > 0;
+              const poleR = isCeiling ? topR : botR;
+              const poleG = isCeiling ? topG : botG;
+              const poleB = isCeiling ? topB : botB;
+              const phi = (0.5 - v / eqH) * pi;
+              const vignette = Math.cos(phi);
+
+              outData[outIdx]     = Math.min(255, Math.max(0, Math.round(poleR * (0.88 + 0.12 * vignette))));
+              outData[outIdx + 1] = Math.min(255, Math.max(0, Math.round(poleG * (0.88 + 0.12 * vignette))));
+              outData[outIdx + 2] = Math.min(255, Math.max(0, Math.round(poleB * (0.88 + 0.12 * vignette))));
+              outData[outIdx + 3] = 255;
+            } else {
+              outData[outIdx]     = 15;
+              outData[outIdx + 1] = 20;
+              outData[outIdx + 2] = 30;
+              outData[outIdx + 3] = 255;
+            }
+          }
+        }
+      }
+
+      ctx.putImageData(outImgData, 0, 0);
+      return canvas;
+    }
+
+    // ---------------------------------------------------------------------------
+    // THREE.JS 3D SCENE & SQUARE FRUSTUMS INITIALIZATION
+    // ---------------------------------------------------------------------------
+    function initThreeScene() {
+      const mount = document.getElementById('canvasMount');
+      const width = mount.clientWidth;
+      const height = mount.clientHeight;
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x020617);
+
+      camera = new THREE.PerspectiveCamera(targetFov, width / height, 0.1, 2000);
+      camera.position.set(0, 0, 0.1);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(width, height);
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = sphereBrightnessMultiplier;
+      mount.appendChild(renderer.domElement);
+
+      orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+      orbitControls.enableDamping = true;
+      orbitControls.dampingFactor = 0.08;
+      orbitControls.enabled = false;
+
+      // Inverted Photosphere Mesh (High density 128x96)
+      const geometry = new THREE.SphereGeometry(500, 128, 96);
+      geometry.scale(-1, 1, 1);
+      const material = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+      sphereMesh = new THREE.Mesh(geometry, material);
+      scene.add(sphereMesh);
+
+      // Photo Tourism Camera Frustums Group
+      tourismGroup = new THREE.Group();
+      scene.add(tourismGroup);
+
+      const gridHelper = new THREE.GridHelper(320, 20, 0x0284c7, 0x1e293b);
+      gridHelper.position.y = -100;
+      tourismGroup.add(gridHelper);
+
+      setupCanvasInteractions(renderer.domElement);
+      window.addEventListener('resize', handleWindowResize);
+
+      animate();
+    }
+
+    function updateThreeTexture(canvasSource) {
+      if (stitchedTexture) stitchedTexture.dispose();
+
+      stitchedTexture = new THREE.CanvasTexture(canvasSource);
+      stitchedTexture.colorSpace = THREE.SRGBColorSpace;
+      stitchedTexture.generateMipmaps = true;
+      stitchedTexture.minFilter = THREE.LinearMipmapLinearFilter;
+      stitchedTexture.magFilter = THREE.LinearFilter;
+
+      const maxAnisotropy = renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 16;
+      stitchedTexture.anisotropy = maxAnisotropy;
+
+      sphereMesh.material.map = stitchedTexture;
+      sphereMesh.material.color.setHex(0xffffff);
+      sphereMesh.material.needsUpdate = true;
+      sphereMesh.visible = true;
+    }
+
+    function updatePhotoTourismFrustums() {
+      while(tourismGroup.children.length > 1) {
+        tourismGroup.remove(tourismGroup.children[1]);
+      }
+      frustumObjects = [];
+
+      const N = photoItems.length;
+      if (!N) return;
+
+      photoItems.forEach((item, index) => {
+        const frustum = createCameraFrustum(item, item.yaw, index, N);
+        tourismGroup.add(frustum);
+        frustumObjects.push(frustum);
+      });
+
+      createPointCloud();
+    }
+
+    // Square 1:1 Camera Frustum in 3D Space
+    function createCameraFrustum(item, yawDeg, index, total) {
+      const frustumGroup = new THREE.Group();
+      const yawRad = THREE.MathUtils.degToRad(yawDeg);
+      const distance = 160;
+
+      const cx = distance * Math.sin(yawRad);
+      const cy = 0;
+      const cz = distance * Math.cos(yawRad);
+
+      frustumGroup.position.set(cx, cy, cz);
+      frustumGroup.lookAt(0, 0, 0);
+
+      // Square 1:1 Pyramid Wireframe (w == h)
+      const fovSize = 24; // Square width and height
+      const fovD = 34;
+      const points = [
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(-fovSize,  fovSize, -fovD),
+        new THREE.Vector3( fovSize,  fovSize, -fovD),
+        new THREE.Vector3( fovSize, -fovSize, -fovD),
+        new THREE.Vector3(-fovSize, -fovSize, -fovD),
+      ];
+
+      const lineIndices = [
+        0, 1,  0, 2,  0, 3,  0, 4,
+        1, 2,  2, 3,  3, 4,  4, 1
+      ];
+
+      const lineGeo = new THREE.BufferGeometry().setFromPoints(
+        lineIndices.map(i => points[i])
+      );
+      const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 });
+      const wireframe = new THREE.LineSegments(lineGeo, lineMat);
+      frustumGroup.add(wireframe);
+
+      // Pure Square 1:1 Photo Texture Quad
+      if (item.imgElement) {
+        const photoTex = new THREE.CanvasTexture(item.imgElement);
+        photoTex.colorSpace = THREE.SRGBColorSpace;
+        photoTex.generateMipmaps = true;
+        photoTex.minFilter = THREE.LinearMipmapLinearFilter;
+        const quadGeo = new THREE.PlaneGeometry(fovSize * 2, fovSize * 2); // 1:1 Square Plane
+        const quadMat = new THREE.MeshBasicMaterial({
+          map: photoTex,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.94
+        });
+        const quad = new THREE.Mesh(quadGeo, quadMat);
+        quad.position.z = -fovD;
+        frustumGroup.add(quad);
+      }
+
+      // Central Ray line
+      const rayGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, 0, -distance * 0.9)
+      ]);
+      const rayMat = new THREE.LineDashedMaterial({ color: 0xf59e0b, dashSize: 4, gapSize: 3 });
+      const ray = new THREE.Line(rayGeo, rayMat);
+      ray.computeLineDistances();
+      frustumGroup.add(ray);
+
+      frustumGroup.userData = {
+        name: item.name,
+        yawDeg: yawDeg,
+        index: index,
+        camPos: new THREE.Vector3(cx, cy, cz)
+      };
+
+      return frustumGroup;
+    }
+
+    function createPointCloud() {
+      const particleCount = 180;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+
+      for (let i = 0; i < particleCount; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const phi = (Math.random() - 0.5) * Math.PI * 0.7;
+        const r = 85 + Math.random() * 40;
+
+        positions[i * 3]     = r * Math.cos(phi) * Math.sin(theta);
+        positions[i * 3 + 1] = r * Math.sin(phi);
+        positions[i * 3 + 2] = r * Math.cos(phi) * Math.cos(theta);
+
+        colors[i * 3]     = 0.2 + Math.random() * 0.6;
+        colors[i * 3 + 1] = 0.7 + Math.random() * 0.3;
+        colors[i * 3 + 2] = 1.0;
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const mat = new THREE.PointsMaterial({
+        size: 3.5,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.75
+      });
+
+      const pCloud = new THREE.Points(geometry, mat);
+      tourismGroup.add(pCloud);
+    }
+
+    // ---------------------------------------------------------------------------
+    // VIEWPORT INTERACTIONS & ORBIT CONTROLS
+    // ---------------------------------------------------------------------------
+    function setupCanvasInteractions(domElement) {
+      domElement.addEventListener('pointerdown', (e) => {
+        if (currentViewMode === 'sphere') {
+          isDragging = true;
+          previousMousePosition = { x: e.clientX, y: e.clientY };
+        } else if (currentViewMode === 'tourism') {
+          checkFrustumRaycastClick(e);
+        }
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (isDragging && currentViewMode === 'sphere') {
+          const deltaX = e.clientX - previousMousePosition.x;
+          const deltaY = e.clientY - previousMousePosition.y;
+
+          lon -= deltaX * 0.15;
+          lat += deltaY * 0.15;
+
+          previousMousePosition = { x: e.clientX, y: e.clientY };
+        }
+      });
+
+      window.addEventListener('pointerup', () => {
+        isDragging = false;
+      });
+
+      domElement.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        adjustFov(e.deltaY * 0.05);
+      }, { passive: false });
+    }
+
+    function checkFrustumRaycastClick(e) {
+      if (isTransitioningCamera) return;
+      const rect = renderer.domElement.getBoundingClientRect();
+      const mouse = new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1
+      );
+
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, camera);
+
+      const intersects = raycaster.intersectObjects(frustumObjects, true);
+      if (intersects.length > 0) {
+        let hitObject = intersects[0].object;
+        while (hitObject.parent && !hitObject.userData.name) {
+          hitObject = hitObject.parent;
+        }
+
+        if (hitObject.userData && hitObject.userData.name) {
+          flyCameraToFrustum(hitObject.userData);
+        }
+      }
+    }
+
+    function flyCameraToFrustum(userData) {
+      isTransitioningCamera = true;
+      const banner = document.getElementById('tourismBanner');
+      const bannerText = document.getElementById('tourismBannerText');
+      bannerText.innerText = `Flying into: ${userData.name}...`;
+      banner.classList.remove('hidden');
+
+      const startPos = camera.position.clone();
+      const targetPos = userData.camPos.clone().multiplyScalar(0.75);
+      const startTime = performance.now();
+      const duration = 1200;
+
+      function animateFly(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const ease = progress < 0.5 
+          ? 4 * progress * progress * progress 
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+        camera.position.lerpVectors(startPos, targetPos, ease);
+        camera.lookAt(0, 0, 0);
+
+        if (progress < 1) {
+          requestAnimationFrame(animateFly);
+        } else {
+          isTransitioningCamera = false;
+          bannerText.innerText = `Viewpoint: ${userData.name} (${userData.yawDeg}° Azimuth)`;
+        }
+      }
+
+      requestAnimationFrame(animateFly);
+    }
+
+    function adjustFov(delta) {
+      targetFov = Math.max(30, Math.min(100, targetFov + delta));
+    }
+
+    function toggleAutoRotate() {
+      isAutoRotating = !isAutoRotating;
+      const icon = document.getElementById('rotateIcon');
+      const btn = document.getElementById('autoRotateBtn');
+      if (isAutoRotating) {
+        icon.setAttribute('data-lucide', 'pause');
+        btn.classList.add('bg-brand-600', 'text-white');
+      } else {
+        icon.setAttribute('data-lucide', 'play');
+        btn.classList.remove('bg-brand-600', 'text-white');
+      }
+      lucide.createIcons();
+    }
+
+    function resetCameraOrientation() {
+      lon = 0;
+      lat = 0;
+      targetFov = 75;
+      if (currentViewMode === 'tourism') {
+        camera.position.set(0, 80, 220);
+        camera.lookAt(0, 0, 0);
+        orbitControls.target.set(0, 0, 0);
+      }
+    }
+
+    function toggleFullscreen() {
+      const container = document.getElementById('canvasMount');
+      if (!document.fullscreenElement) {
+        container.requestFullscreen().catch(err => alert(err.message));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    function handleWindowResize() {
+      const mount = document.getElementById('canvasMount');
+      if (!mount || !renderer || !camera) return;
+      const width = mount.clientWidth;
+      const height = mount.clientHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    }
+
+    // ---------------------------------------------------------------------------
+    // VIEWER MODE SWITCHER (GOOGLE SPHERE vs PHOTO TOURISM vs CROSS)
+    // ---------------------------------------------------------------------------
+    function switchViewerMode(mode) {
+      currentViewMode = mode;
+      const crossLayout = document.getElementById('crossLayoutContainer');
+      const compassWidget = document.getElementById('compassWidget');
+      const tourismBanner = document.getElementById('tourismBanner');
+
+      ['sphere', 'tourism', 'cross'].forEach(m => {
+        const tab = document.getElementById(`tab${m.charAt(0).toUpperCase() + m.slice(1)}`);
+        if (m === mode) {
+          tab.className = 'px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 bg-brand-600 text-white shadow-sm';
+        } else {
+          tab.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5';
+        }
+      });
+
+      if (mode === 'sphere') {
+        crossLayout.classList.add('hidden');
+        compassWidget.classList.remove('hidden');
+        tourismBanner.classList.add('hidden');
+        sphereMesh.visible = true;
+        sphereMesh.material.opacity = 1.0;
+        sphereMesh.material.transparent = false;
+        tourismGroup.visible = false;
+        orbitControls.enabled = false;
+        camera.position.set(0, 0, 0.1);
+        document.getElementById('compassTitle').innerText = '360° Sphere Orbit';
+      } else if (mode === 'tourism') {
+        crossLayout.classList.add('hidden');
+        compassWidget.classList.remove('hidden');
+        tourismBanner.classList.remove('hidden');
+        sphereMesh.visible = true;
+        sphereMesh.material.opacity = 0.45;
+        sphereMesh.material.transparent = true;
+        tourismGroup.visible = true;
+        orbitControls.enabled = true;
+        camera.position.set(0, 60, 240);
+        camera.lookAt(0, 0, 0);
+        orbitControls.target.set(0, 0, 0);
+        document.getElementById('compassTitle').innerText = 'Photo Tourism 3D Orbit';
+      } else if (mode === 'cross') {
+        crossLayout.classList.remove('hidden');
+        compassWidget.classList.add('hidden');
+        tourismBanner.classList.add('hidden');
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // RENDER & ANIMATION LOOP
+    // ---------------------------------------------------------------------------
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (Math.abs(currentFov - targetFov) > 0.05) {
+        currentFov += (targetFov - currentFov) * 0.1;
+        camera.fov = currentFov;
+        camera.updateProjectionMatrix();
+        document.getElementById('fovReadout').innerText = `FOV: ${Math.round(currentFov)}° • Square 1:1 • 0% Ghosting`;
+      }
+
+      if (currentViewMode === 'sphere') {
+        if (isAutoRotating && !isDragging) {
+          lon += autoRotateSpeed * 40;
+        }
+
+        lat = Math.max(-85, Math.min(85, lat));
+        phi = THREE.MathUtils.degToRad(90 - lat);
+        theta = THREE.MathUtils.degToRad(lon);
+
+        const currentAzimuth = (Math.round(-lon) % 360 + 360) % 360;
+        document.getElementById('headingText').innerText = `${getHeadingName(currentAzimuth)} (${currentAzimuth}°)`;
+        document.getElementById('compassNeedle').style.transform = `rotate(${currentAzimuth}deg)`;
+
+        const targetX = 500 * Math.sin(phi) * Math.cos(theta);
+        const targetY = 500 * Math.cos(phi);
+        const targetZ = 500 * Math.sin(phi) * Math.sin(theta);
+        camera.lookAt(targetX, targetY, targetZ);
+      } else if (currentViewMode === 'tourism') {
+        if (orbitControls.enabled && !isTransitioningCamera) {
+          orbitControls.update();
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    function getHeadingName(deg) {
+      if (deg >= 337.5 || deg < 22.5) return 'N';
+      if (deg >= 22.5 && deg < 67.5) return 'NE';
+      if (deg >= 67.5 && deg < 112.5) return 'E';
+      if (deg >= 112.5 && deg < 157.5) return 'SE';
+      if (deg >= 157.5 && deg < 202.5) return 'S';
+      if (deg >= 202.5 && deg < 247.5) return 'SW';
+      if (deg >= 247.5 && deg < 292.5) return 'W';
+      return 'NW';
+    }
+
+    // ---------------------------------------------------------------------------
+    // DOWNLOAD OUTPUT
+    // ---------------------------------------------------------------------------
+    function downloadEquirectangular() {
+      if (!stitchedEquirectCanvas) return;
+      const link = document.createElement('a');
+      link.download = `spatia_square_photosphere_${Date.now()}.jpg`;
+      link.href = stitchedEquirectCanvas.toDataURL('image/jpeg', 0.96);
+      link.click();
+    }
+  </script>
+</body>
+</html>
