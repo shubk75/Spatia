@@ -181,7 +181,7 @@
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 space-y-6">
 
     <!-- TOP ROW: Mode Selector & Stitch Action -->
-    <div class="glass-card rounded-3xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-brand-500/15 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-brand-950/40">
+    <div class="glass-card rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-slate-800/80">
       
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center shrink-0">
@@ -190,8 +190,8 @@
         <div>
           <div class="flex items-center gap-2">
             <h2 class="text-sm font-bold text-white">Square Edge-to-Edge Stitching Engine</h2>
-            <span class="text-[10px] bg-brand-500/20 text-brand-300 px-2 py-0.5 rounded-full font-mono font-bold">Square 1:1</span>
-            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-mono font-bold">0% Ghosting</span>
+            <span class="text-[10px] bg-slate-800/80 text-brand-300 px-2 py-0.5 rounded-full font-mono font-medium border border-slate-700/80">Square 1:1</span>
+            <span class="text-[10px] bg-slate-800/80 text-emerald-300 px-2 py-0.5 rounded-full font-mono font-medium border border-slate-700/80">0% Ghosting</span>
           </div>
           <p class="text-xs text-slate-400">Photos are framed as 1:1 squares with edges touching seamlessly at exact sector boundaries with zero ghosting.</p>
         </div>
@@ -215,11 +215,11 @@
       </div>
     </div>
 
-    <!-- MAIN TWO-COLUMN WORKFLOW -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- MAIN STACKED WORKFLOW: Upload/Sequence Controls ABOVE, 3D Viewer BELOW -->
+    <div class="flex flex-col gap-6">
 
-      <!-- LEFT COLUMN (5 cols): Photo Sequence & Direction Selectors -->
-      <div class="lg:col-span-5 space-y-4">
+      <!-- UPLOAD & CONTROLS SECTION: Photo Sequence & Direction Selectors -->
+      <div class="space-y-4">
         
         <!-- Batch Upload Zone -->
         <div id="dropZone" class="glass-card border-2 border-dashed border-slate-700 hover:border-brand-400 rounded-3xl p-5 text-center transition-all cursor-pointer group relative overflow-hidden">
@@ -258,9 +258,9 @@
           </div>
 
           <!-- List of Photo Cards with Individual Direction Selectors (SQUARE THUMBNAILS) -->
-          <div class="space-y-2.5 max-h-[310px] overflow-y-auto pr-1" id="photoSequenceList">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2.5 max-h-[420px] overflow-y-auto pr-1" id="photoSequenceList">
             <!-- Dynamic Photo Cards with Direction Dropdowns -->
-            <div class="p-6 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
+            <div class="sm:col-span-2 xl:col-span-3 p-6 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
               No photos uploaded yet. Drop 5~10 photos above or click Sample Demos.
             </div>
           </div>
@@ -317,11 +317,11 @@
 
       </div>
 
-      <!-- RIGHT COLUMN (7 cols): Interactive 3D Viewport (Google Sphere & Photo Tourism) -->
-      <div class="lg:col-span-7 space-y-4">
+      <!-- 3D VIEWER SECTION: Interactive 3D Viewport (Google Sphere & Photo Tourism) -->
+      <div class="space-y-4">
         
         <!-- Viewer Container Card -->
-        <div class="glass-panel rounded-3xl overflow-hidden border border-slate-800 shadow-2xl relative flex flex-col h-[660px]">
+        <div class="glass-panel rounded-3xl overflow-hidden border border-slate-800 shadow-2xl relative flex flex-col h-[500px] sm:h-[600px] lg:h-[720px]">
           
           <!-- Viewport Header Toolbar -->
           <div class="px-4 py-2.5 border-b border-slate-800/80 flex items-center justify-between bg-slate-950/80 backdrop-blur-md z-10">
@@ -349,11 +349,11 @@
             </div>
           </div>
 
-          <!-- Content Row: 3D Canvas + Side-by-Side Historical Context Panel -->
-          <div class="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
+          <!-- Content Row: 3D Canvas + Side-by-Side Historical Context Panel (also the fullscreen target, so Site Info stays visible in fullscreen) -->
+          <div id="viewerContentRow" class="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden bg-slate-950">
 
-          <!-- 3D Canvas Mount Point -->
-          <div class="relative flex-1 min-w-0 min-h-0 bg-slate-950 overflow-hidden canvas-container" id="canvasMount">
+          <!-- 3D Canvas Mount Point (~75% width when Site Info is open) -->
+          <div class="relative flex-1 md:flex-[3_3_0%] min-w-0 min-h-0 bg-slate-950 overflow-hidden canvas-container" id="canvasMount">
             
             <!-- Canvas Placeholder (when no stitched sphere is loaded yet) -->
             <div id="emptyViewerState" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
@@ -445,8 +445,8 @@
 
           </div>
 
-          <!-- Historical / Contextual Info Side Panel (upload .md/.pdf; renders side-by-side with the 3D view) -->
-          <div id="infoSidePanel" class="hidden w-full md:max-w-[380px] md:w-[380px] shrink-0 border-t md:border-t-0 md:border-l border-slate-800 bg-slate-950/95 backdrop-blur-md flex-col overflow-hidden h-64 md:h-auto z-30">
+          <!-- Historical / Contextual Info Side Panel (upload .md/.pdf; renders side-by-side with the 3D view, ~25% width) -->
+          <div id="infoSidePanel" class="hidden w-full md:w-auto md:flex-[1_1_0%] md:min-w-[260px] flex-none border-t md:border-t-0 md:border-l border-slate-800 bg-slate-950/95 backdrop-blur-md flex-col overflow-hidden h-64 md:h-auto z-30">
 
             <div class="px-4 py-2.5 border-b border-slate-800/80 flex items-center justify-between bg-slate-950/90 shrink-0">
               <div class="flex items-center gap-2">
@@ -729,7 +729,7 @@
 
       if (!photoItems.length) {
         container.innerHTML = `
-          <div class="p-6 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
+          <div class="sm:col-span-2 xl:col-span-3 p-6 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
             No photos uploaded yet. Drop 5~10 photos above or click Sample Demos.
           </div>
         `;
@@ -1947,7 +1947,9 @@
     }
 
     function toggleFullscreen() {
-      const container = document.getElementById('canvasMount');
+      // Fullscreen the row that holds BOTH the 3D canvas and the Site Info panel,
+      // so uploaded historical context stays visible/readable in fullscreen mode.
+      const container = document.getElementById('viewerContentRow');
       if (!document.fullscreenElement) {
         container.requestFullscreen().catch(err => alert(err.message));
       } else {
