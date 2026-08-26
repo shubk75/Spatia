@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SPATIA 3D — Square Edge-to-Edge Photo Sphere & Tourism Studio</title>
+  <title>SPATIA 3D — Photo Sphere &amp; Tourism Studio</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -14,17 +14,17 @@
         extend: {
           colors: {
             brand: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              200: '#bae6fd',
-              300: '#7dd3fc',
-              400: '#38bdf8',
-              500: '#0ea5e9',
-              600: '#0284c7',
-              700: '#0369a1',
-              800: '#075985',
-              900: '#0c4a6e',
-              950: '#082f49',
+              50: '#f4f6fa',
+              100: '#e7ebf2',
+              200: '#c9d3e2',
+              300: '#a2b1c9',
+              400: '#7789aa',
+              500: '#576a8c',
+              600: '#455470',
+              700: '#39445b',
+              800: '#2e364a',
+              900: '#252b3a',
+              950: '#181c26',
             }
           }
         }
@@ -52,11 +52,11 @@
       background: rgba(15, 23, 42, 0.6);
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(56, 189, 248, 0.25);
+      background: rgba(119, 137, 170, 0.3);
       border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(56, 189, 248, 0.5);
+      background: rgba(119, 137, 170, 0.5);
     }
     
     .glass-panel {
@@ -93,13 +93,13 @@
     #siteInfoContent ul { list-style-type: disc; }
     #siteInfoContent ol { list-style-type: decimal; }
     #siteInfoContent li { margin-bottom: 0.25em; }
-    #siteInfoContent a { color: #38bdf8; text-decoration: underline; }
+    #siteInfoContent a { color: #a2b1c9; text-decoration: underline; }
     #siteInfoContent strong { color: #e2e8f0; font-weight: 700; }
     #siteInfoContent em { color: #cbd5e1; }
-    #siteInfoContent code { background: rgba(56,189,248,0.12); color: #7dd3fc; padding: 0.1em 0.35em; border-radius: 0.3em; font-size: 0.85em; }
+    #siteInfoContent code { background: rgba(119,137,170,0.14); color: #c9d3e2; padding: 0.1em 0.35em; border-radius: 0.3em; font-size: 0.85em; }
     #siteInfoContent pre { background: rgba(2,6,23,0.7); padding: 0.65em 0.8em; border-radius: 0.6em; overflow-x: auto; margin-bottom: 0.7em; border: 1px solid rgba(255,255,255,0.06); }
     #siteInfoContent pre code { background: transparent; padding: 0; }
-    #siteInfoContent blockquote { border-left: 2px solid rgba(56,189,248,0.45); padding-left: 0.7em; color: #94a3b8; font-style: italic; margin: 0 0 0.7em; }
+    #siteInfoContent blockquote { border-left: 2px solid rgba(119,137,170,0.5); padding-left: 0.7em; color: #94a3b8; font-style: italic; margin: 0 0 0.7em; }
     #siteInfoContent hr { border-color: rgba(255,255,255,0.08); margin: 0.9em 0; }
     #siteInfoContent img { max-width: 100%; border-radius: 0.6em; margin: 0.4em 0; }
     #siteInfoContent table { width: 100%; font-size: 0.75rem; border-collapse: collapse; margin-bottom: 0.7em; display: block; overflow-x: auto; }
@@ -114,21 +114,14 @@
   <!-- ========================================================================= -->
   <header class="sticky top-0 z-40 w-full glass-panel border-b border-slate-800/80 px-4 lg:px-8 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-cyan-400 p-0.5 shadow-lg shadow-brand-500/20 flex items-center justify-center">
-        <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-          <i data-lucide="globe" class="w-5 h-5 text-brand-400"></i>
-        </div>
+      <div class="w-10 h-10 rounded-2xl bg-brand-700 flex items-center justify-center">
+        <i data-lucide="globe" class="w-5 h-5 text-brand-200"></i>
       </div>
       <div>
-        <div class="flex items-center gap-2">
-          <h1 class="text-base lg:text-lg font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-brand-300">
-            SPATIA 3D
-          </h1>
-          <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20">
-            Square Edge-to-Edge &bull; Zero Ghosting
-          </span>
-        </div>
-        <p class="text-[11px] text-slate-400 hidden sm:block">Edge-Touching Square Photo Projections, 0% Ghosting, 16x Anisotropic Filtering & 3D Spatial Navigation</p>
+        <h1 class="text-base lg:text-lg font-bold tracking-tight text-white">
+          SPATIA 3D
+        </h1>
+        <p class="text-[11px] text-slate-400 hidden sm:block">Panorama Stitching &amp; 3D Viewer</p>
       </div>
     </div>
 
@@ -136,31 +129,22 @@
     <div class="flex items-center gap-2.5">
       <div class="dropdown relative group">
         <button id="demoBtn" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-200 hover:text-white transition-all shadow-sm">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-slate-400"></i>
           <span>Sample Demos</span>
           <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
         </button>
         <div class="absolute right-0 mt-1.5 w-64 py-1.5 bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-2xl shadow-2xl hidden group-hover:block z-50 animate-in fade-in zoom-in-95">
-          <button onclick="loadSampleDataset('room')" class="w-full text-left px-3.5 py-2 hover:bg-brand-600/20 flex items-start gap-2.5 text-xs text-slate-200 hover:text-white transition-colors">
-            <span class="text-base">🛋️</span>
-            <div>
-              <div class="font-bold">Living Room & Office (6 Square Views)</div>
-              <div class="text-[10px] text-slate-400">60° angular square sectors touching edge-to-edge</div>
-            </div>
+          <button onclick="loadSampleDataset('room')" class="w-full text-left px-3.5 py-2 hover:bg-brand-600/20 flex items-center gap-2.5 text-xs text-slate-200 hover:text-white transition-colors">
+            <i data-lucide="armchair" class="w-3.5 h-3.5 text-brand-300 shrink-0"></i>
+            <div class="font-semibold">Living Room &amp; Office</div>
           </button>
-          <button onclick="loadSampleDataset('temple')" class="w-full text-left px-3.5 py-2 hover:bg-brand-600/20 flex items-start gap-2.5 text-xs text-slate-200 hover:text-white transition-colors">
-            <span class="text-base">🏛️</span>
-            <div>
-              <div class="font-bold">Temple Sanctuary (6 Cube Faces)</div>
-              <div class="text-[10px] text-slate-400">Exact 90° square faces touching along all seams</div>
-            </div>
+          <button onclick="loadSampleDataset('temple')" class="w-full text-left px-3.5 py-2 hover:bg-brand-600/20 flex items-center gap-2.5 text-xs text-slate-200 hover:text-white transition-colors">
+            <i data-lucide="landmark" class="w-3.5 h-3.5 text-brand-300 shrink-0"></i>
+            <div class="font-semibold">Temple Sanctuary</div>
           </button>
-          <button onclick="loadSampleDataset('loft')" class="w-full text-left px-3.5 py-2 hover:bg-brand-600/20 flex items-start gap-2.5 text-xs text-slate-200 hover:text-white transition-colors">
-            <span class="text-base">🏙️</span>
-            <div>
-              <div class="font-bold">City Loft 360° (8 Square Views)</div>
-              <div class="text-[10px] text-slate-400">45° angular square sectors with zero ghosting</div>
-            </div>
+          <button onclick="loadSampleDataset('loft')" class="w-full text-left px-3.5 py-2 hover:bg-brand-600/20 flex items-center gap-2.5 text-xs text-slate-200 hover:text-white transition-colors">
+            <i data-lucide="building-2" class="w-3.5 h-3.5 text-brand-300 shrink-0"></i>
+            <div class="font-semibold">City Loft 360°</div>
           </button>
         </div>
       </div>
@@ -188,12 +172,8 @@
           <i data-lucide="square" class="w-5 h-5 text-brand-400"></i>
         </div>
         <div>
-          <div class="flex items-center gap-2">
-            <h2 class="text-sm font-bold text-white">Square Edge-to-Edge Stitching Engine</h2>
-            <span class="text-[10px] bg-slate-800/80 text-brand-300 px-2 py-0.5 rounded-full font-mono font-medium border border-slate-700/80">Square 1:1</span>
-            <span class="text-[10px] bg-slate-800/80 text-emerald-300 px-2 py-0.5 rounded-full font-mono font-medium border border-slate-700/80">0% Ghosting</span>
-          </div>
-          <p class="text-xs text-slate-400">Photos are framed as 1:1 squares with edges touching seamlessly at exact sector boundaries with zero ghosting.</p>
+          <h2 class="text-sm font-bold text-white">Stitching Engine</h2>
+          <p class="text-xs text-slate-400">Photos are stitched into a seamless 360° panorama with no visible seams.</p>
         </div>
       </div>
 
@@ -202,12 +182,12 @@
         
         <!-- Auto-Detect Directions Button -->
         <button onclick="autoDetectDirections()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-brand-300 hover:text-white transition-all shadow-sm" title="Automatically detect circular order and assign directions to dropdowns">
-          <i data-lucide="wand-2" class="w-3.5 h-3.5 text-amber-400"></i>
+          <i data-lucide="wand-2" class="w-3.5 h-3.5 text-slate-400"></i>
           <span>Auto-Detect Directions</span>
         </button>
 
         <!-- Primary Action: Stitch Button -->
-        <button id="stitchBtn" onclick="runStitchingProcess()" class="flex items-center justify-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 hover:from-brand-500 hover:to-cyan-400 text-white font-bold text-xs shadow-lg shadow-brand-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]">
+        <button id="stitchBtn" onclick="runStitchingProcess()" class="flex items-center justify-center gap-2 px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-sm transition-colors active:scale-[0.98]">
           <i data-lucide="sparkles" class="w-4 h-4"></i>
           <span>Stitch 360° Panorama</span>
         </button>
@@ -231,9 +211,8 @@
             </div>
             <div>
               <p class="text-xs font-bold text-slate-200 group-hover:text-brand-300">
-                Drop 5 to 10 Photos Here (or Click to Browse)
+                Drop 5–10 photos here, or click to browse
               </p>
-              <p class="text-[11px] text-slate-400 mt-0.5">Photos are automatically standardized as square 1:1 images</p>
             </div>
             <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-800/80 border border-slate-700 text-[10px] text-slate-300 font-mono">
               <span id="photoCountBadge">0 Photos Loaded</span>
@@ -251,7 +230,7 @@
             </div>
             <div class="flex items-center gap-1.5">
               <button onclick="reversePhotoSequence()" class="p-1 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-[10px] text-slate-300 font-mono flex items-center gap-1" title="Reverse sequence order">
-                <i data-lucide="refresh-cw" class="w-3 h-3 text-cyan-400"></i>
+                <i data-lucide="refresh-cw" class="w-3 h-3 text-brand-300"></i>
                 <span>Reverse</span>
               </button>
             </div>
@@ -261,7 +240,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2.5 max-h-[420px] overflow-y-auto pr-1" id="photoSequenceList">
             <!-- Dynamic Photo Cards with Direction Dropdowns -->
             <div class="sm:col-span-2 xl:col-span-3 p-6 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-              No photos uploaded yet. Drop 5~10 photos above or click Sample Demos.
+              No photos uploaded yet.
             </div>
           </div>
 
@@ -272,29 +251,27 @@
             <div class="flex items-center justify-between">
               <label class="flex items-center gap-1.5 font-medium text-slate-300">
                 <i data-lucide="maximize" class="w-3.5 h-3.5 text-brand-400"></i>
-                <span>Camera Field of View (FOV):</span>
+                <span>Field of View:</span>
               </label>
-              <span class="font-mono text-brand-400 font-bold" id="fovSliderVal">Auto (Edge-Locked)</span>
+              <span class="font-mono text-brand-400 font-bold" id="fovSliderVal">Auto</span>
             </div>
             <input type="range" id="cameraFovSlider" min="45" max="90" value="60" step="1" oninput="updateCameraFov(this.value)" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-500" />
             <div class="flex justify-between text-[9px] text-slate-500 font-mono">
-              <span>Auto Sector Lock</span>
-              <span>Exact Edge Touch</span>
-              <span>90° (Wide Cube)</span>
+              <span>Auto</span>
+              <span>90° Wide</span>
             </div>
 
             <!-- Smart Floor / Ceiling Extension Toggle -->
             <div class="flex items-center justify-between pt-1">
               <span class="flex items-center gap-1.5 text-slate-300">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
-                <span>Smart Ambient Floor & Ceiling Fill:</span>
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-300"></i>
+                <span>Floor &amp; Ceiling Fill:</span>
               </span>
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="smartPolesToggle" checked class="sr-only peer" onchange="runStitchingProcess()">
                 <div class="w-8 h-4 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-brand-600"></div>
               </label>
             </div>
-            <p class="text-[10px] text-slate-500">Automatically blends top & bottom polar caps seamlessly when no ceiling/floor photo is uploaded.</p>
 
           </div>
 
@@ -305,14 +282,14 @@
           <div class="flex items-center justify-between text-xs">
             <span class="font-bold text-brand-300 flex items-center gap-2" id="progressLabel">
               <div class="w-2 h-2 rounded-full bg-brand-400 animate-ping"></div>
-              Stitching Edge-to-Edge 4K Panorama...
+              Stitching panorama...
             </span>
             <span class="font-mono text-brand-400 font-bold" id="progressPercent">0%</span>
           </div>
           <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-            <div id="progressBar" class="h-full bg-gradient-to-r from-brand-500 to-cyan-400 w-0 transition-all duration-150"></div>
+            <div id="progressBar" class="h-full bg-brand-500 w-0 transition-all duration-150"></div>
           </div>
-          <p class="text-[10px] text-slate-400 font-mono" id="progressDetail">Applying zero-ghosting edge-touching ray projection...</p>
+          <p class="text-[10px] text-slate-400 font-mono" id="progressDetail">Processing...</p>
         </div>
 
       </div>
@@ -330,15 +307,15 @@
             <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-2xl border border-slate-800">
               <button id="tabSphere" onclick="switchViewerMode('sphere')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 bg-brand-600 text-white shadow-sm">
                 <i data-lucide="globe" class="w-3.5 h-3.5"></i>
-                <span>Google Photo Sphere</span>
+                <span>Sphere</span>
               </button>
               <button id="tabTourism" onclick="switchViewerMode('tourism')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
-                <i data-lucide="camera" class="w-3.5 h-3.5 text-amber-400"></i>
-                <span>Photo Tourism 3D</span>
+                <i data-lucide="camera" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span>Tourism</span>
               </button>
               <button id="tabCross" onclick="switchViewerMode('cross')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
-                <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-cyan-400"></i>
-                <span>Cross Layout</span>
+                <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-brand-300"></i>
+                <span>Cross</span>
               </button>
             </div>
 
@@ -360,14 +337,14 @@
               <div class="w-16 h-16 rounded-3xl bg-slate-900 border border-slate-800 flex items-center justify-center mb-3 text-slate-500 shadow-xl">
                 <i data-lucide="eye" class="w-8 h-8"></i>
               </div>
-              <h4 class="text-sm font-bold text-slate-300">Ready to Stitch Square Edge-to-Edge Sphere</h4>
-              <p class="text-xs text-slate-400 max-w-sm mt-1">Upload 5~10 photos or click <b>"Sample Demos"</b> in the top navbar to see square photos touching edges with zero ghosting!</p>
+              <h4 class="text-sm font-bold text-slate-300">Get started</h4>
+              <p class="text-xs text-slate-400 max-w-sm mt-1">Upload 5–10 photos, or try a sample dataset.</p>
               <div class="flex items-center gap-2 mt-4">
                 <button onclick="loadSampleDataset('room')" class="px-4 py-2 rounded-xl bg-brand-600/20 hover:bg-brand-600/30 text-brand-300 border border-brand-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors">
-                  <span>🛋️ Living Room Demo</span>
+                  <span>Living Room Demo</span>
                 </button>
                 <button onclick="loadSampleDataset('temple')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors">
-                  <span>🏛️ Temple Demo</span>
+                  <span>Temple Demo</span>
                 </button>
               </div>
             </div>
@@ -384,14 +361,14 @@
               </div>
               <div>
                 <div class="text-[11px] font-bold" id="compassTitle">360° Sphere Orbit</div>
-                <div class="text-[9px] text-slate-400 font-mono" id="fovReadout">Square 1:1 &bull; 0% Ghosting &bull; 16x Anisotropic</div>
+                <div class="text-[9px] text-slate-400 font-mono" id="fovReadout">FOV: 75°</div>
               </div>
             </div>
 
             <!-- Photo Tourism Frustum Selected Hint Banner -->
-            <div id="tourismBanner" class="absolute top-3 right-3 px-3.5 py-1.5 rounded-2xl glass-panel border-amber-500/30 text-amber-300 text-xs font-bold shadow-xl hidden z-20 flex items-center gap-2">
-              <i data-lucide="camera" class="w-4 h-4 text-amber-400"></i>
-              <span id="tourismBannerText">Click any square camera pyramid to fly into photo!</span>
+            <div id="tourismBanner" class="absolute top-3 right-3 px-3.5 py-1.5 rounded-2xl glass-panel border-slate-600/40 text-slate-300 text-xs font-bold shadow-xl hidden z-20 flex items-center gap-2">
+              <i data-lucide="camera" class="w-4 h-4 text-slate-400"></i>
+              <span id="tourismBannerText">Click a camera to view that photo</span>
             </div>
 
             <!-- Bottom Floating Control Bar -->
@@ -405,10 +382,10 @@
 
               <!-- Live Brightness / Exposure Slider -->
               <div class="flex items-center gap-1.5 bg-slate-900 rounded-xl px-2.5 py-1.5 border border-slate-800 text-xs">
-                <i data-lucide="sun" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+                <i data-lucide="sun" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
                 <span class="text-[10px] text-slate-400 hidden md:inline">Brightness:</span>
-                <input type="range" id="brightnessSlider" min="50" max="250" value="125" step="5" oninput="updateSphereBrightness(this.value)" class="w-16 sm:w-20 h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-amber-400" />
-                <span class="font-mono text-[10px] text-amber-300 font-bold" id="brightnessVal">125%</span>
+                <input type="range" id="brightnessSlider" min="50" max="250" value="125" step="5" oninput="updateSphereBrightness(this.value)" class="w-16 sm:w-20 h-1 bg-slate-800 rounded appearance-none cursor-pointer accent-brand-400" />
+                <span class="font-mono text-[10px] text-slate-300 font-bold" id="brightnessVal">125%</span>
               </div>
 
               <!-- Zoom In / Out FOV -->
@@ -428,7 +405,7 @@
 
               <!-- Download Stitched Equirectangular JPEG -->
               <button id="downloadBtn" onclick="downloadEquirectangular()" disabled class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition-colors disabled:opacity-40 disabled:pointer-events-none" title="Download 360° Panorama JPG">
-                <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <i data-lucide="download" class="w-3.5 h-3.5 text-brand-300"></i>
               </button>
 
               <!-- Fullscreen Toggle -->
@@ -473,13 +450,13 @@
                 <i data-lucide="file-text" class="w-3 h-3 text-brand-400"></i>
                 <span id="siteInfoFileName"></span>
               </div>
-              <p id="siteInfoHint" class="text-[10px] text-slate-500">Upload a Markdown (.md) or PDF file to attach historical/background info that readers can view side-by-side with this 3D scene.</p>
+              <p id="siteInfoHint" class="text-[10px] text-slate-500">Upload a Markdown or PDF file to view alongside the 3D scene.</p>
             </div>
 
             <div id="siteInfoContent" class="flex-1 overflow-y-auto px-4 py-3 text-xs leading-relaxed text-slate-300">
               <div id="siteInfoEmptyState" class="flex flex-col items-center justify-center text-center h-full py-10 text-slate-500 space-y-2">
                 <i data-lucide="file-text" class="w-8 h-8"></i>
-                <p class="text-[11px] max-w-[220px]">No context file loaded yet. Upload a markdown or PDF file describing this site's history to read it alongside the 3D view.</p>
+                <p class="text-[11px] max-w-[220px]">No file loaded yet.</p>
               </div>
             </div>
 
@@ -499,32 +476,32 @@
     <section id="aboutSection" class="glass-panel rounded-3xl p-6 space-y-4 border border-slate-800">
       <div class="flex items-center gap-2">
         <i data-lucide="layers" class="w-5 h-5 text-brand-400"></i>
-        <h3 class="text-sm font-bold text-white uppercase tracking-wider">How the Square Edge-to-Edge Zero-Ghosting Pipeline Works</h3>
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider">How it works</h3>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-400">
         <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1.5">
           <div class="font-bold text-brand-300 flex items-center gap-2">
             <span class="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center font-mono text-[10px]">1</span>
-            Square 1:1 Standardization
+            Standardize
           </div>
-          <p>Every photo is cropped/framed as a pure square (\(1:1\) aspect ratio) and projected with matching square focal lengths so each photo covers its exact angular sector without stretching.</p>
+          <p>Each photo is cropped to a square and projected at a matching focal length so it fills its angular sector without stretching.</p>
         </div>
 
         <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1.5">
           <div class="font-bold text-brand-300 flex items-center gap-2">
             <span class="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center font-mono text-[10px]">2</span>
-            Exact Edge-Touching Boundaries
+            Align
           </div>
-          <p>For \(N\) photos around 360°, each photo spans an exact angular width \(\Delta\theta = \frac{360^\circ}{N}\). The right edge of photo \(k\) meets and touches the left edge of photo \(k+1\) seamlessly.</p>
+          <p>Photos are spaced evenly around 360°, with each one's edge meeting the next seamlessly.</p>
         </div>
 
         <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1.5">
           <div class="font-bold text-brand-300 flex items-center gap-2">
             <span class="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center font-mono text-[10px]">3</span>
-            100% Zero-Ghosting Ray Assignment
+            Project
           </div>
-          <p>Each spherical pixel \((\theta, \phi)\) is sampled from its designated photo sector with crisp subpixel bilinear filtering. Because multiple photos are never averaged together, ghosting is completely eliminated.</p>
+          <p>Every point on the sphere is sampled from a single source photo, so nothing is blended or ghosted.</p>
         </div>
       </div>
     </section>
@@ -535,7 +512,7 @@
   <!-- FOOTER -->
   <!-- ========================================================================= -->
   <footer class="w-full border-t border-slate-800/80 py-4 px-6 text-center text-xs text-slate-500">
-    SPATIA 3D &bull; Square Edge-to-Edge 4K Immersive Reconstruction Engine &bull; Pure Client-Side WebGL
+    SPATIA 3D &bull; Runs entirely in your browser
   </footer>
 
   <!-- ========================================================================= -->
@@ -604,7 +581,7 @@
 
     function updateCameraFov(val) {
       customCameraFov = parseFloat(val);
-      document.getElementById('fovSliderVal').innerText = `${customCameraFov}° (Edge-Locked)`;
+      document.getElementById('fovSliderVal').innerText = `${customCameraFov}°`;
       if (photoItems.length >= 2) {
         runStitchingProcess();
       }
@@ -725,12 +702,12 @@
     function renderPhotoSequenceList() {
       const container = document.getElementById('photoSequenceList');
       const countBadge = document.getElementById('photoCountBadge');
-      countBadge.innerText = `${photoItems.length} Photos Loaded (Square 1:1)`;
+      countBadge.innerText = `${photoItems.length} photo${photoItems.length === 1 ? '' : 's'} loaded`;
 
       if (!photoItems.length) {
         container.innerHTML = `
           <div class="sm:col-span-2 xl:col-span-3 p-6 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-            No photos uploaded yet. Drop 5~10 photos above or click Sample Demos.
+            No photos uploaded yet.
           </div>
         `;
         return;
@@ -755,12 +732,11 @@
             </div>
             <!-- Pure Square Thumbnail -->
             <div class="w-12 h-12 rounded-xl overflow-hidden bg-slate-900 border border-slate-700 shrink-0 aspect-square shadow-sm">
-              <img src="${item.dataUrl}" class="w-full h-full object-cover" alt="Square Photo ${index + 1}" />
+              <img src="${item.dataUrl}" class="w-full h-full object-cover" alt="Photo ${index + 1}" />
             </div>
             <div class="space-y-1 min-w-0 flex-1">
               <div class="font-bold text-slate-200 truncate max-w-[130px] flex items-center gap-1.5">
                 <span>${item.name}</span>
-                <span class="text-[9px] bg-slate-800 text-brand-400 px-1 py-0.2 rounded font-mono">1:1</span>
               </div>
               
               <!-- Interactive Direction Dropdown -->
@@ -1214,7 +1190,7 @@
       };
 
       try {
-        setProgress(15, 'Standardizing square 1:1 aspect ratios...');
+        setProgress(15, 'Normalizing photos...');
         await new Promise(r => setTimeout(r, 20));
 
         // 4K Ultra-HD Equirectangular resolution
@@ -1228,12 +1204,12 @@
 
         if (hasCardinal4 && (hasUp || hasDown)) {
           // Mode A: 6-Face Exact Cube Mapping (100% Zero Ghosting, Exact Touching Cube Edges)
-          setProgress(45, 'Executing 6-face square cube projection with touching edges...');
+          setProgress(45, 'Building cube projection...');
           await new Promise(r => setTimeout(r, 20));
 
           const cubeFaces = extractStandardizedCubeFaces(photoItems, 1024);
 
-          setProgress(70, 'Mapping square faces to equirectangular with zero ghosting...');
+          setProgress(70, 'Mapping to panorama...');
           await new Promise(r => setTimeout(r, 20));
 
           stitchedEquirectCanvas = cubemapToEquirectangular(cubeFaces, eqWidth, eqHeight);
@@ -1241,19 +1217,19 @@
           document.getElementById('crossImg').src = stitchedCrossCanvas.toDataURL('image/jpeg', 0.96);
         } else {
           // Mode B: Exact Angular Sector Edge-Touching Stitcher (100% Zero Ghosting)
-          setProgress(45, 'Executing square edge-to-edge optical ray-casting...');
+          setProgress(45, 'Projecting photos onto sphere...');
           await new Promise(r => setTimeout(r, 20));
 
           stitchedEquirectCanvas = stitchSquareEdgeToEdgePanorama(photoItems, eqWidth, eqHeight, smartPoles);
         }
 
-        setProgress(88, 'Updating 3D Photo Sphere & Square Camera Frustums...');
+        setProgress(88, 'Updating 3D view...');
         await new Promise(r => setTimeout(r, 20));
 
         updateThreeTexture(stitchedEquirectCanvas);
         updatePhotoTourismFrustums();
 
-        setProgress(100, 'Square Edge-to-Edge Stitching completed!');
+        setProgress(100, 'Done');
         await new Promise(r => setTimeout(r, 30));
 
         document.getElementById('emptyViewerState').classList.add('hidden');
@@ -2026,7 +2002,7 @@
         currentFov += (targetFov - currentFov) * 0.1;
         camera.fov = currentFov;
         camera.updateProjectionMatrix();
-        document.getElementById('fovReadout').innerText = `FOV: ${Math.round(currentFov)}° • Square 1:1 • 0% Ghosting`;
+        document.getElementById('fovReadout').innerText = `FOV: ${Math.round(currentFov)}°`;
       }
 
       if (currentViewMode === 'sphere') {
@@ -2185,7 +2161,7 @@
       hint.classList.remove('hidden');
       content.innerHTML = `<div id="siteInfoEmptyState" class="flex flex-col items-center justify-center text-center h-full py-10 text-slate-500 space-y-2">
         <i data-lucide="file-text" class="w-8 h-8"></i>
-        <p class="text-[11px] max-w-[220px]">No context file loaded yet. Upload a markdown or PDF file describing this site's history to read it alongside the 3D view.</p>
+        <p class="text-[11px] max-w-[220px]">No file loaded yet.</p>
       </div>`;
       lucide.createIcons();
     }
