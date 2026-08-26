@@ -285,15 +285,6 @@
         <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
       </button>
 
-      <button id="exportProjectBtn" onclick="exportProject()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-all text-xs" title="Export Project (photos + site info)">
-        <i data-lucide="package-plus" class="w-4 h-4"></i>
-      </button>
-
-      <input type="file" id="importProjectInput" accept=".json,application/json" class="hidden" onchange="importProject(event)" />
-      <button id="importProjectBtn" onclick="document.getElementById('importProjectInput').click()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-all text-xs" title="Import Project (.json)">
-        <i data-lucide="folder-up" class="w-4 h-4"></i>
-      </button>
-
       <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-all text-xs" title="Switch theme">
         <i data-lucide="moon" id="themeIconMoon" class="w-4 h-4"></i>
         <i data-lucide="sun" id="themeIconSun" class="w-4 h-4 hidden"></i>
@@ -549,10 +540,16 @@
                 <i data-lucide="compass" class="w-3.5 h-3.5 text-brand-400"></i>
               </button>
 
-              <!-- Download Stitched Equirectangular JPEG -->
-              <button id="downloadBtn" onclick="downloadEquirectangular()" disabled class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition-colors disabled:opacity-40 disabled:pointer-events-none" title="Download 360° Panorama JPG">
-                <i data-lucide="download" class="w-3.5 h-3.5 text-brand-300"></i>
-              </button>
+              <!-- Project Export / Import -->
+              <div class="flex items-center gap-1">
+                <button id="exportProjectBtn" onclick="exportProject()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition-colors disabled:opacity-40 disabled:pointer-events-none" title="Export Project (photos + site info)">
+                  <i data-lucide="package-plus" class="w-3.5 h-3.5 text-brand-300"></i>
+                </button>
+                <input type="file" id="importProjectInput" accept=".json,application/json" class="hidden" onchange="importProject(event)" />
+                <button id="importProjectBtn" onclick="document.getElementById('importProjectInput').click()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition-colors" title="Import Project (.json)">
+                  <i data-lucide="folder-up" class="w-3.5 h-3.5 text-brand-300"></i>
+                </button>
+              </div>
 
               <!-- Fullscreen Toggle -->
               <button onclick="toggleFullscreen()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition-colors" title="Toggle Fullscreen">
@@ -666,6 +663,34 @@
   <!-- ========================================================================= -->
   <script>
     // ---------------------------------------------------------------------------
+    // TABLE OF CONTENTS
+    //   CONFIG                          — tunable constants shared across modules
+    //   DIRECTION OPTIONS & STATE       — compass directions + global app state
+    //   INITIALIZATION                  — boot sequence
+    //   THEME TOGGLE                    — dark/light mode
+    //   IMAGE STANDARDIZATION           — crop/resize photos to square
+    //   PHOTO LIST MANAGEMENT           — upload, reorder, delete, drag & drop
+    //   AUTO-DETECT DIRECTIONS          — even angular distribution
+    //   PROCEDURAL DEMO GENERATORS      — built-in sample datasets
+    //   CUBEMAP & STITCHING ENGINE      — the two panorama projection paths
+    //   THREE.JS VIEWER                 — sphere / tourism / cross 3D scene
+    //   VIEWER UI CONTROLS              — fov, brightness, rotation, fullscreen
+    //   SITE INFO PANEL                 — Markdown/PDF side panel
+    //   PROJECT IMPORT / EXPORT         — save/load a full .json project
+    //   PANORAMA EXPORT                 — JPEG / PNG / clipboard (bottom of file)
+    // ---------------------------------------------------------------------------
+
+    // ---------------------------------------------------------------------------
+    // CONFIG
+    // ---------------------------------------------------------------------------
+    const CONFIG = {
+      PHOTO_SIZE: 1024,     // every uploaded/demo photo is standardized to this square size
+      EQUI_WIDTH: 4096,     // output equirectangular panorama width
+      EQUI_HEIGHT: 2048,    // output equirectangular panorama height (2:1 ratio)
+      JPEG_QUALITY: 0.96,   // quality used for internal + exported JPEGs
+    };
+
+    // ---------------------------------------------------------------------------
     // DIRECTION OPTIONS & STATE
     // ---------------------------------------------------------------------------
     const DIRECTION_OPTIONS = [
@@ -777,7 +802,7 @@
     // ---------------------------------------------------------------------------
     // STANDARDIZE ANY IMAGE TO PURE SQUARE 1:1
     // ---------------------------------------------------------------------------
-    function standardizeToSquare(imgElement, targetSize = 1024) {
+    function standardizeToSquare(imgElement, targetSize = CONFIG.PHOTO_SIZE) {
       const canvas = document.createElement('canvas');
       canvas.width = targetSize;
       canvas.height = targetSize;
@@ -848,8 +873,8 @@
           const rawImg = new Image();
           rawImg.onload = () => {
             // Standardize raw photo to high-res 1024x1024 square image
-            const squareCanvas = standardizeToSquare(rawImg, 1024);
-            const squareDataUrl = squareCanvas.toDataURL('image/jpeg', 0.96);
+            const squareCanvas = standardizeToSquare(rawImg, CONFIG.PHOTO_SIZE);
+            const squareDataUrl = squareCanvas.toDataURL('image/jpeg', CONFIG.JPEG_QUALITY);
             const dirMeta = DIRECTION_OPTIONS.find(d => d.id === directionKey) || DIRECTION_OPTIONS[0];
 
             photoItems.push({
@@ -974,7 +999,7 @@
         runStitchingProcess();
       } else {
         document.getElementById('emptyViewerState').classList.remove('hidden');
-        if (sphereMesh) sphereMesh.visible = false;
+          if (sphereMesh) sphereMesh.visible = false;
         if (tourismGroup) tourismGroup.visible = false;
       }
     }
@@ -1008,7 +1033,6 @@
       photoItems = [];
       renderPhotoSequenceList();
       document.getElementById('emptyViewerState').classList.remove('hidden');
-      document.getElementById('downloadBtn').disabled = true;
       if (sphereMesh) sphereMesh.visible = false;
       if (tourismGroup) tourismGroup.visible = false;
     }
@@ -1051,14 +1075,14 @@
     // ---------------------------------------------------------------------------
     async function loadSampleDataset(type) {
       photoItems = [];
-      const res = 1024; // Pure 1024x1024 Square
+      const res = CONFIG.PHOTO_SIZE; // Pure square, matches uploaded-photo standardization
 
       if (type === 'temple') {
         const cardinalOrder = ['north', 'east', 'south', 'west', 'up', 'down'];
         for (const faceKey of cardinalOrder) {
           const dirMeta = DIRECTION_OPTIONS.find(d => d.id === faceKey);
           const canvas = generateProceduralTempleFace(faceKey, res);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.96);
+          const dataUrl = canvas.toDataURL('image/jpeg', CONFIG.JPEG_QUALITY);
           const blob = await (await fetch(dataUrl)).blob();
 
           photoItems.push({
@@ -1077,7 +1101,7 @@
         const numPhotos = 6;
         for (let i = 0; i < numPhotos; i++) {
           const canvas = generateProceduralRoomSweepPhoto(i, numPhotos, res);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.96);
+          const dataUrl = canvas.toDataURL('image/jpeg', CONFIG.JPEG_QUALITY);
           const blob = await (await fetch(dataUrl)).blob();
           const angleDeg = Math.round((i / numPhotos) * 360);
 
@@ -1105,7 +1129,7 @@
         const numPhotos = 8;
         for (let i = 0; i < numPhotos; i++) {
           const canvas = generateProceduralLoftPhoto(i, numPhotos, res);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.96);
+          const dataUrl = canvas.toDataURL('image/jpeg', CONFIG.JPEG_QUALITY);
           const blob = await (await fetch(dataUrl)).blob();
           const angleDeg = Math.round((i / numPhotos) * 360);
 
@@ -1136,7 +1160,7 @@
     }
 
     // Procedural Room Multi-View Generator (Square 1024x1024)
-    function generateProceduralRoomSweepPhoto(index, total, size = 1024) {
+    function generateProceduralRoomSweepPhoto(index, total, size = CONFIG.PHOTO_SIZE) {
       const canvas = document.createElement('canvas');
       canvas.width = size;
       canvas.height = size;
@@ -1255,7 +1279,7 @@
       return canvas;
     }
 
-    function generateProceduralTempleFace(faceKey, size = 1024) {
+    function generateProceduralTempleFace(faceKey, size = CONFIG.PHOTO_SIZE) {
       const canvas = document.createElement('canvas');
       canvas.width = size;
       canvas.height = size;
@@ -1316,7 +1340,7 @@
       return canvas;
     }
 
-    function generateProceduralLoftPhoto(index, total, size = 1024) {
+    function generateProceduralLoftPhoto(index, total, size = CONFIG.PHOTO_SIZE) {
       const canvas = document.createElement('canvas');
       canvas.width = size;
       canvas.height = size;
@@ -1369,8 +1393,8 @@
         await new Promise(r => setTimeout(r, 20));
 
         // 4K Ultra-HD Equirectangular resolution
-        const eqWidth = 4096;
-        const eqHeight = 2048;
+        const eqWidth = CONFIG.EQUI_WIDTH;
+        const eqHeight = CONFIG.EQUI_HEIGHT;
         const smartPoles = document.getElementById('smartPolesToggle').checked;
 
         const hasUp = photoItems.some(p => p.directionKey === 'up');
@@ -1382,14 +1406,14 @@
           setProgress(45, 'Building cube projection...');
           await new Promise(r => setTimeout(r, 20));
 
-          const cubeFaces = extractStandardizedCubeFaces(photoItems, 1024);
+          const cubeFaces = extractStandardizedCubeFaces(photoItems, CONFIG.PHOTO_SIZE);
 
           setProgress(70, 'Mapping to panorama...');
           await new Promise(r => setTimeout(r, 20));
 
           stitchedEquirectCanvas = cubemapToEquirectangular(cubeFaces, eqWidth, eqHeight);
           stitchedCrossCanvas = createCrossCubemapLayout(cubeFaces);
-          document.getElementById('crossImg').src = stitchedCrossCanvas.toDataURL('image/jpeg', 0.96);
+          document.getElementById('crossImg').src = stitchedCrossCanvas.toDataURL('image/jpeg', CONFIG.JPEG_QUALITY);
         } else {
           // Mode B: Exact Angular Sector Edge-Touching Stitcher (100% Zero Ghosting)
           setProgress(45, 'Projecting photos onto sphere...');
@@ -1408,7 +1432,6 @@
         await new Promise(r => setTimeout(r, 30));
 
         document.getElementById('emptyViewerState').classList.add('hidden');
-        document.getElementById('downloadBtn').disabled = false;
         progressCard.classList.add('hidden');
       } catch (err) {
         console.error('Stitching error:', err);
@@ -1421,7 +1444,7 @@
     // ---------------------------------------------------------------------------
     // CUBEMAP 6-FACE EXTRACTION (SQUARE 1:1, TOUCHING EDGES)
     // ---------------------------------------------------------------------------
-    function extractStandardizedCubeFaces(items, faceSize = 1024) {
+    function extractStandardizedCubeFaces(items, faceSize = CONFIG.PHOTO_SIZE) {
       const faces = {};
       const required = ['north', 'east', 'south', 'west', 'up', 'down'];
 
@@ -1640,7 +1663,7 @@
 
       // Extract square image buffers (standardized 1:1)
       const photoBuffers = photos.map((item) => {
-        const squareImg = standardizeToSquare(item.imgElement, 1024);
+        const squareImg = standardizeToSquare(item.imgElement, CONFIG.PHOTO_SIZE);
         const w = squareImg.width;
         const h = squareImg.height; // Square: w == h
 
@@ -2559,16 +2582,6 @@
       }
     }
 
-    // ---------------------------------------------------------------------------
-    // DOWNLOAD OUTPUT
-    // ---------------------------------------------------------------------------
-    function downloadEquirectangular() {
-      if (!stitchedEquirectCanvas) return;
-      const link = document.createElement('a');
-      link.download = `spatia_square_photosphere_${Date.now()}.jpg`;
-      link.href = stitchedEquirectCanvas.toDataURL('image/jpeg', 0.96);
-      link.click();
-    }
   </script>
 </body>
 </html>
