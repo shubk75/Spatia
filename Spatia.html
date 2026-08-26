@@ -4,6 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SPATIA 3D — Photo Sphere &amp; Tourism Studio</title>
+
+  <!-- Apply saved theme preference before anything paints, to avoid a flash of the wrong theme -->
+  <script>
+    (function () {
+      var saved = localStorage.getItem('spatia-theme');
+      if (saved === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -72,7 +84,7 @@
       border: 1px solid rgba(255, 255, 255, 0.07);
     }
     .glass-card:hover {
-      border-color: rgba(56, 189, 248, 0.35);
+      border-color: rgba(119, 137, 170, 0.45);
     }
 
     .canvas-container {
@@ -105,6 +117,126 @@
     #siteInfoContent table { width: 100%; font-size: 0.75rem; border-collapse: collapse; margin-bottom: 0.7em; display: block; overflow-x: auto; }
     #siteInfoContent th, #siteInfoContent td { border: 1px solid rgba(255,255,255,0.08); padding: 0.3em 0.55em; text-align: left; }
     #siteInfoContent th { color: #e2e8f0; background: rgba(255,255,255,0.03); }
+
+    /* =======================================================================
+       LIGHT THEME
+       The 3D viewer (the "viewer-shell" card and everything inside it —
+       toolbar, canvas, HUDs, control bar, site-info panel) always keeps its
+       dark, cinema-style chrome for the best view of photos/panoramas.
+       Only the surrounding app chrome switches between light and dark.
+       ======================================================================= */
+
+    html:not(.dark) body { background-color: #f8fafc; }
+
+    /* Page-level backgrounds */
+    html:not(.dark) [class~="bg-slate-950"] { background-color: #f8fafc; }
+    html:not(.dark) [class~="bg-slate-950/95"] { background-color: rgba(255,255,255,0.95); }
+    html:not(.dark) [class~="bg-slate-950/90"] { background-color: rgba(255,255,255,0.9); }
+    html:not(.dark) [class~="bg-slate-950/80"] { background-color: rgba(255,255,255,0.85); }
+
+    /* Card / surface backgrounds */
+    html:not(.dark) [class~="bg-slate-900"] { background-color: #ffffff; }
+    html:not(.dark) [class~="bg-slate-900/60"] { background-color: rgba(255,255,255,0.75); }
+    html:not(.dark) [class~="bg-slate-900/80"] { background-color: rgba(255,255,255,0.85); }
+    html:not(.dark) [class~="bg-slate-900/90"] { background-color: rgba(255,255,255,0.92); }
+    html:not(.dark) [class~="bg-slate-900/95"] { background-color: rgba(255,255,255,0.96); }
+
+    /* Nested control / input backgrounds */
+    html:not(.dark) [class~="bg-slate-800"] { background-color: #eef1f6; }
+    html:not(.dark) [class~="bg-slate-800/80"] { background-color: rgba(238,241,246,0.92); }
+    html:not(.dark) [class~="bg-slate-700"] { background-color: #e2e8f0; }
+
+    /* Borders */
+    html:not(.dark) [class~="border-slate-800"] { border-color: #e2e8f0; }
+    html:not(.dark) [class~="border-slate-800/80"] { border-color: rgba(226,232,240,0.9); }
+    html:not(.dark) [class~="border-slate-800/60"] { border-color: rgba(226,232,240,0.7); }
+    html:not(.dark) [class~="border-slate-700"] { border-color: #cbd5e1; }
+    html:not(.dark) [class~="border-slate-600/40"] { border-color: rgba(100,116,139,0.35); }
+
+    /* Text */
+    html:not(.dark) [class~="text-slate-100"] { color: #0f172a; }
+    html:not(.dark) [class~="text-slate-200"] { color: #1e293b; }
+    html:not(.dark) [class~="text-slate-300"] { color: #334155; }
+    html:not(.dark) [class~="text-slate-400"] { color: #64748b; }
+    html:not(.dark) [class~="text-slate-500"] { color: #94a3b8; }
+
+    /* Headings that use plain white text (never on a solid brand button) */
+    html:not(.dark) h1[class~="text-white"],
+    html:not(.dark) h2[class~="text-white"],
+    html:not(.dark) h3[class~="text-white"] { color: #0f172a; }
+
+    /* Hover states on chrome buttons */
+    html:not(.dark) [class~="hover:bg-slate-800"]:hover { background-color: #e2e8f0; }
+    html:not(.dark) [class~="hover:bg-slate-700"]:hover { background-color: #cbd5e1; }
+    html:not(.dark) [class~="hover:text-white"]:hover { color: #0f172a; }
+
+    /* Accent icon/text tints */
+    html:not(.dark) [class~="text-brand-200"] { color: #576a8c; }
+    html:not(.dark) [class~="text-brand-300"] { color: #455470; }
+    html:not(.dark) [class~="text-brand-400"] { color: #39445b; }
+    html:not(.dark) .group:hover [class~="group-hover:text-brand-300"] { color: #455470; }
+
+    /* Glass surfaces used by outer chrome (header, cards, about section) */
+    html:not(.dark) .glass-panel {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+    html:not(.dark) .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      border-color: rgba(15, 23, 42, 0.07);
+    }
+    html:not(.dark) .glass-card:hover {
+      border-color: rgba(69, 84, 112, 0.4);
+    }
+
+    /* Floor & Ceiling Fill toggle track — a touch darker than generic
+       surfaces so the white knob stays visible against it */
+    html:not(.dark) #smartPolesToggle + div { background-color: #cbd5e1; }
+
+    /* ---------------------------------------------------------------------
+       Keep the 3D viewer card and everything inside it dark in both themes.
+       Higher selector specificity than the rules above wins automatically.
+       --------------------------------------------------------------------- */
+    html:not(.dark) .viewer-shell[class~="bg-slate-950"],
+    html:not(.dark) .viewer-shell [class~="bg-slate-950"] { background-color: #020617; }
+    html:not(.dark) .viewer-shell [class~="bg-slate-950/95"] { background-color: rgba(2,6,23,0.95); }
+    html:not(.dark) .viewer-shell [class~="bg-slate-950/90"] { background-color: rgba(2,6,23,0.9); }
+    html:not(.dark) .viewer-shell [class~="bg-slate-950/80"] { background-color: rgba(2,6,23,0.8); }
+
+    html:not(.dark) .viewer-shell[class~="bg-slate-900"],
+    html:not(.dark) .viewer-shell [class~="bg-slate-900"] { background-color: #0f172a; }
+    html:not(.dark) .viewer-shell [class~="bg-slate-900/60"] { background-color: rgba(15,23,42,0.6); }
+    html:not(.dark) .viewer-shell [class~="bg-slate-900/80"] { background-color: rgba(15,23,42,0.8); }
+    html:not(.dark) .viewer-shell [class~="bg-slate-900/90"] { background-color: rgba(15,23,42,0.9); }
+    html:not(.dark) .viewer-shell [class~="bg-slate-900/95"] { background-color: rgba(15,23,42,0.95); }
+
+    html:not(.dark) .viewer-shell [class~="bg-slate-800"] { background-color: #1e293b; }
+    html:not(.dark) .viewer-shell [class~="bg-slate-800/80"] { background-color: rgba(30,41,59,0.8); }
+    html:not(.dark) .viewer-shell [class~="bg-slate-700"] { background-color: #334155; }
+
+    html:not(.dark) .viewer-shell[class~="border-slate-800"],
+    html:not(.dark) .viewer-shell [class~="border-slate-800"] { border-color: #1e293b; }
+    html:not(.dark) .viewer-shell [class~="border-slate-800/80"] { border-color: rgba(30,41,59,0.8); }
+    html:not(.dark) .viewer-shell [class~="border-slate-800/60"] { border-color: rgba(30,41,59,0.6); }
+    html:not(.dark) .viewer-shell [class~="border-slate-700"] { border-color: #334155; }
+    html:not(.dark) .viewer-shell [class~="border-slate-600/40"] { border-color: rgba(71,85,105,0.4); }
+
+    html:not(.dark) .viewer-shell [class~="text-slate-100"] { color: #f1f5f9; }
+    html:not(.dark) .viewer-shell [class~="text-slate-200"] { color: #e2e8f0; }
+    html:not(.dark) .viewer-shell [class~="text-slate-300"] { color: #cbd5e1; }
+    html:not(.dark) .viewer-shell [class~="text-slate-400"] { color: #94a3b8; }
+    html:not(.dark) .viewer-shell [class~="text-slate-500"] { color: #64748b; }
+    html:not(.dark) .viewer-shell [class~="text-white"] { color: #ffffff; }
+    html:not(.dark) .viewer-shell [class~="hover:bg-slate-800"]:hover { background-color: #1e293b; }
+    html:not(.dark) .viewer-shell [class~="hover:text-white"]:hover { color: #ffffff; }
+    html:not(.dark) .viewer-shell [class~="text-brand-300"] { color: #a2b1c9; }
+    html:not(.dark) .viewer-shell [class~="text-brand-400"] { color: #7789aa; }
+
+    html:not(.dark) .viewer-shell.glass-panel,
+    html:not(.dark) .viewer-shell .glass-panel {
+      background: rgba(15, 23, 42, 0.88);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-brand-500 selection:text-white flex flex-col overflow-x-hidden">
@@ -151,6 +283,11 @@
 
       <button onclick="resetAll()" class="p-2 rounded-xl bg-slate-900 hover:bg-red-500/10 border border-slate-700 hover:border-red-500/40 text-slate-400 hover:text-red-400 transition-all text-xs" title="Reset All Images">
         <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+      </button>
+
+      <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-all text-xs" title="Switch theme">
+        <i data-lucide="moon" id="themeIconMoon" class="w-4 h-4"></i>
+        <i data-lucide="sun" id="themeIconSun" class="w-4 h-4 hidden"></i>
       </button>
 
       <a href="#aboutSection" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-all text-xs" title="About Algorithm">
@@ -298,7 +435,7 @@
       <div class="space-y-4">
         
         <!-- Viewer Container Card -->
-        <div class="glass-panel rounded-3xl overflow-hidden border border-slate-800 shadow-2xl relative flex flex-col h-[500px] sm:h-[600px] lg:h-[720px]">
+        <div class="viewer-shell glass-panel rounded-3xl overflow-hidden border border-slate-800 shadow-2xl relative flex flex-col h-[500px] sm:h-[600px] lg:h-[720px]">
           
           <!-- Viewport Header Toolbar -->
           <div class="px-4 py-2.5 border-b border-slate-800/80 flex items-center justify-between bg-slate-950/80 backdrop-blur-md z-10">
@@ -577,7 +714,33 @@
       lucide.createIcons();
       initThreeScene();
       setupDropZone();
+      syncThemeIcon();
     });
+
+    // ---------------------------------------------------------------------------
+    // LIGHT / DARK THEME TOGGLE
+    // ---------------------------------------------------------------------------
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      if (isDark) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('spatia-theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('spatia-theme', 'dark');
+      }
+      syncThemeIcon();
+    }
+
+    function syncThemeIcon() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const moonIcon = document.getElementById('themeIconMoon');
+      const sunIcon = document.getElementById('themeIconSun');
+      if (!moonIcon || !sunIcon) return;
+      // Icon shown = the mode a click will switch to.
+      moonIcon.classList.toggle('hidden', isDark);
+      sunIcon.classList.toggle('hidden', !isDark);
+    }
 
     function updateCameraFov(val) {
       customCameraFov = parseFloat(val);
